@@ -1,0 +1,13 @@
+CLAUDE.md
+MLET - Tech Challenge - Fase 4.pdf
+
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+data/*
+!data/sample/
+models/
+logs/
