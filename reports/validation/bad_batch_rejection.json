@@ -1,0 +1,93 @@
+{
+  "batch": "bad_batch",
+  "contract": "scoring_request_contract",
+  "status": "rejected",
+  "failure_cases": 57,
+  "failures_by_check": [
+    {
+      "column": "(record)",
+      "check": "no_duplicate_records",
+      "failures": 8
+    },
+    {
+      "column": "(record)",
+      "check": "loan_to_income_consistent",
+      "failures": 6
+    },
+    {
+      "column": "(record)",
+      "check": "employment_within_working_life",
+      "failures": 6
+    },
+    {
+      "column": "person_age",
+      "check": "in_range(18, 100)",
+      "failures": 6
+    },
+    {
+      "column": "person_income",
+      "check": "not_nullable",
+      "failures": 5
+    },
+    {
+      "column": "(record)",
+      "check": "credit_history_within_working_life",
+      "failures": 4
+    },
+    {
+      "column": "application_id",
+      "check": "field_uniqueness",
+      "failures": 4
+    },
+    {
+      "column": "person_income",
+      "check": "greater_than(0)",
+      "failures": 3
+    },
+    {
+      "column": "person_home_ownership",
+      "check": "isin(['RENT', 'MORTGAGE', 'OWN', 'OTHER'])",
+      "failures": 3
+    },
+    {
+      "column": "loan_grade",
+      "check": "isin(['A', 'B', 'C', 'D', 'E', 'F', 'G'])",
+      "failures": 2
+    },
+    {
+      "column": "loan_int_rate",
+      "check": "less_than_or_equal_to(100)",
+      "failures": 2
+    },
+    {
+      "column": "loan_amnt",
+      "check": "dtype('float64')",
+      "failures": 2
+    },
+    {
+      "column": "loan_amnt",
+      "check": "coerce_dtype('float64')",
+      "failures": 2
+    },
+    {
+      "column": "loan_amnt",
+      "check": "greater_than(0)",
+      "failures": 1
+    },
+    {
+      "column": "application_id",
+      "check": "not_nullable",
+      "failures": 1
+    },
+    {
+      "column": "loan_amnt",
+      "check": "less_than_or_equal_to(1000000)",
+      "failures": 1
+    },
+    {
+      "column": "scoring_request_contract",
+      "check": "column_in_schema",
+      "failures": 1
+    }
+  ]
+}

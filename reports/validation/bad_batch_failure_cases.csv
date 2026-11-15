@@ -1,0 +1,58 @@
+index,application_id,column,check,failure_case
+16,84b3be1a57df3e05,(record),no_duplicate_records,
+98,4309bc4de7bc8505,(record),no_duplicate_records,
+144,e316a060061378f1,(record),no_duplicate_records,
+161,6c228ff51a40ab92,(record),no_duplicate_records,
+200,replay0555969427,(record),no_duplicate_records,
+201,replay0200480540,(record),no_duplicate_records,
+202,replay0839069730,(record),no_duplicate_records,
+203,replay0801630523,(record),no_duplicate_records,
+13,80d2109df90130f1,(record),employment_within_working_life,
+21,0903258bd255d8d0,(record),employment_within_working_life,
+176,92e84efd39859ae5,(record),employment_within_working_life,
+179,3b48ed9ec51cde28,(record),employment_within_working_life,
+182,5383659a9c2f7afd,(record),employment_within_working_life,
+185,0504cf66ffebf1cb,(record),employment_within_working_life,
+13,80d2109df90130f1,(record),credit_history_within_working_life,
+95,bb73ba0786ff4bb0,(record),credit_history_within_working_life,
+176,92e84efd39859ae5,(record),credit_history_within_working_life,
+179,3b48ed9ec51cde28,(record),credit_history_within_working_life,
+38,160200acf42b2fe0,(record),loan_to_income_consistent,
+51,a50aa4d4838195b4,(record),loan_to_income_consistent,
+75,c20cb4489220fd4a,(record),loan_to_income_consistent,
+100,628a0805006d4f6f,(record),loan_to_income_consistent,
+151,54a48d3145d7acff,(record),loan_to_income_consistent,
+177,c95a9434e74e8660,(record),loan_to_income_consistent,
+,,scoring_request_contract,column_in_schema,national_id
+116,dd974e8f25f76598,loan_amnt,coerce_dtype('float64'),unknown
+199,968fe2a92e510427,loan_amnt,coerce_dtype('float64'),unknown
+84,,application_id,not_nullable,
+28,f0ec782ae6d8a923,application_id,field_uniqueness,f0ec782ae6d8a923
+102,f0ec782ae6d8a923,application_id,field_uniqueness,f0ec782ae6d8a923
+131,968fe2a92e510427,application_id,field_uniqueness,968fe2a92e510427
+199,968fe2a92e510427,application_id,field_uniqueness,968fe2a92e510427
+13,80d2109df90130f1,person_age,"in_range(18, 100)",16
+95,bb73ba0786ff4bb0,person_age,"in_range(18, 100)",16
+101,568f8e01bf48aff2,person_age,"in_range(18, 100)",144
+135,b747abd6dad7d8a5,person_age,"in_range(18, 100)",144
+176,92e84efd39859ae5,person_age,"in_range(18, 100)",16
+179,3b48ed9ec51cde28,person_age,"in_range(18, 100)",16
+41,f1da427af4ed0efb,person_income,not_nullable,
+104,1f6fb44d199ed71e,person_income,not_nullable,
+111,386b75ad40d645cd,person_income,not_nullable,
+129,8ce46e473cfcf306,person_income,not_nullable,
+134,9329daa4db9ea7ac,person_income,not_nullable,
+51,a50aa4d4838195b4,person_income,greater_than(0),-42000.0
+75,c20cb4489220fd4a,person_income,greater_than(0),-42000.0
+177,c95a9434e74e8660,person_income,greater_than(0),-42000.0
+116,dd974e8f25f76598,loan_amnt,dtype('float64'),unknown
+199,968fe2a92e510427,loan_amnt,dtype('float64'),unknown
+27,f84a5ff460bd15dc,loan_int_rate,less_than_or_equal_to(100),250.0
+147,ba3bb28542e8a4a3,loan_int_rate,less_than_or_equal_to(100),250.0
+11,6f3c0e83952367d8,person_home_ownership,"isin(['RENT', 'MORTGAGE', 'OWN', 'OTHER'])",UNKNOWN
+24,448395da4481c8d5,person_home_ownership,"isin(['RENT', 'MORTGAGE', 'OWN', 'OTHER'])",UNKNOWN
+68,6e9413f6e1685795,person_home_ownership,"isin(['RENT', 'MORTGAGE', 'OWN', 'OTHER'])",UNKNOWN
+37,e29d0f3ff6cc15b2,loan_grade,"isin(['A', 'B', 'C', 'D', 'E', 'F', 'G'])",Z
+131,968fe2a92e510427,loan_grade,"isin(['A', 'B', 'C', 'D', 'E', 'F', 'G'])",Z
+,,loan_amnt,greater_than(0),"TypeError(""Invalid comparison between dtype=str and int"")"
+,,loan_amnt,less_than_or_equal_to(1000000),"TypeError(""Invalid comparison between dtype=str and int"")"
