@@ -1,0 +1,34 @@
+{
+  "contract": "labeled_credit_contract",
+  "raw_rows": 32581,
+  "exact_duplicates_removed": 165,
+  "rows_rejected_by_contract": 3921,
+  "curated_rows": 28495,
+  "failures_by_check": [
+    {
+      "column": "loan_int_rate",
+      "check": "not_nullable",
+      "failures": 3095
+    },
+    {
+      "column": "person_emp_length",
+      "check": "not_nullable",
+      "failures": 887
+    },
+    {
+      "column": "person_age",
+      "check": "in_range(18, 100)",
+      "failures": 5
+    },
+    {
+      "column": "(record)",
+      "check": "employment_within_working_life",
+      "failures": 2
+    },
+    {
+      "column": "person_emp_length",
+      "check": "in_range(0, 86)",
+      "failures": 2
+    }
+  ]
+}
