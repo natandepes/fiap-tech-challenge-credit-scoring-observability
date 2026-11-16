@@ -5,12 +5,14 @@ description = "Data contracts, drift detection, observability and LGPD governanc
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "evidently>=0.7.23",
     "joblib>=1.6.0",
     "kagglehub>=1.0.3",
-    "pandas>=3.1.1",
+    "pandas>=2.3,<3",
     "pandera>=0.36.0",
     "pyarrow>=26.0.1",
     "scikit-learn>=1.9.1",
+    "scipy>=1.18.1",
 ]
 
 [build-system]
