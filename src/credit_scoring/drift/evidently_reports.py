@@ -5,15 +5,19 @@ from evidently.legacy.calculations.stattests.registry import StatTest, register_
 from evidently.legacy.core import ColumnType
 from evidently.metrics import ValueDrift
 from evidently.presets import ClassificationPreset, DataDriftPreset
+from evidently.tests import gte
 
 from credit_scoring.config import (
     CATEGORICAL_FEATURES,
+    DATASET_DRIFT_FEATURE_SHARE,
     DECISION_THRESHOLD,
     MODEL_FEATURES,
     NUMERIC_FEATURES,
     PREDICTION_COLUMN,
     PROBABILITY_COLUMN,
     PSI_DRIFT_THRESHOLD,
+    RECALL_DROP_ALERT,
+    ROC_AUC_DROP_ALERT,
     TARGET_COLUMN,
 )
 from credit_scoring.drift.statistics import population_stability_index
@@ -70,7 +74,12 @@ def _psi_drift(column: str) -> ValueDrift:
 def data_drift_snapshot(reference: pd.DataFrame, current: pd.DataFrame) -> Snapshot:
     report = Report(
         [
-            DataDriftPreset(columns=MODEL_FEATURES, method=PSI, threshold=PSI_DRIFT_THRESHOLD),
+            DataDriftPreset(
+                columns=MODEL_FEATURES,
+                method=PSI,
+                threshold=PSI_DRIFT_THRESHOLD,
+                drift_share=DATASET_DRIFT_FEATURE_SHARE,
+            ),
             _psi_drift(TARGET_COLUMN),
         ],
         include_tests=True,
@@ -82,11 +91,22 @@ def data_drift_snapshot(reference: pd.DataFrame, current: pd.DataFrame) -> Snaps
     )
 
 
-def model_health_snapshot(reference: pd.DataFrame, current: pd.DataFrame) -> Snapshot:
+def _minimum(baseline: dict, metric: str, allowed_drop: float) -> list:
+    return [gte(round(baseline[metric] - allowed_drop, 4))]
+
+
+def model_health_snapshot(
+    reference: pd.DataFrame, current: pd.DataFrame, baseline: dict
+) -> Snapshot:
     report = Report(
         [
             _psi_drift(PROBABILITY_COLUMN),
-            ClassificationPreset(probas_threshold=DECISION_THRESHOLD),
+            ClassificationPreset(
+                probas_threshold=DECISION_THRESHOLD,
+                rocauc_tests=_minimum(baseline, "roc_auc", ROC_AUC_DROP_ALERT),
+                recall_tests=_minimum(baseline, "recall", RECALL_DROP_ALERT),
+                tpr_tests=_minimum(baseline, "recall", RECALL_DROP_ALERT),
+            ),
         ],
         include_tests=True,
     )

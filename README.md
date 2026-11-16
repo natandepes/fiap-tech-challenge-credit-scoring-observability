@@ -275,6 +275,11 @@ Why these choices:
 - **Two verdicts: material and significant.** PSI measures the size of a shift and drives the
   alerts. KS and chi-square say whether a shift is statistically real. With about 1,900 rows a
   month they also flag shifts too small to matter, so they are reported but raise no alert.
+- **Evidently's pass/fail checks use the same thresholds as the alerts.** The data drift report
+  marks the whole dataset as drifted when at least 10% of the features (1 of 10) drift. Evidently's
+  default needs 50%, which in June reported "no dataset drift" while 3 features had drifted. In the
+  model health report, the ROC AUC and recall checks fail at the same drops that raise alerts
+  (0.05 and 0.10). Evidently's default ±20% tolerance had passed June's AUC of 0.83.
 - **Calibration catches what the inputs cannot show.** Concept drift does not change the inputs,
   so only outcome-based checks see it. A model whose predicted default rate falls below the observed
   rate no longer reflects reality.

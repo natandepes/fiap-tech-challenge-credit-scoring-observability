@@ -91,7 +91,7 @@ def check_month(
 ) -> MonthCheck:
     current = scored_month(month)
     data_drift = data_drift_snapshot(reference, current)
-    model_health = model_health_snapshot(holdout, current)
+    model_health = model_health_snapshot(holdout, current, baseline)
     save_html(month, data_drift, model_health)
 
     feature_psi = psi_by_column(data_drift)
