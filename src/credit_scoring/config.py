@@ -38,6 +38,7 @@ SAMPLE_SIZE = 500
 
 ID_COLUMN = "application_id"
 TARGET_COLUMN = "loan_status"
+DECISION_THRESHOLD = 0.5
 
 CATEGORY_DOMAINS = {
     "person_home_ownership": ["RENT", "MORTGAGE", "OWN", "OTHER"],

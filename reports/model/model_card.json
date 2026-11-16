@@ -28,6 +28,7 @@
     "recall": 0.7101,
     "f1": 0.8141,
     "observed_default_rate": 0.2171,
-    "predicted_default_rate": 0.1616
+    "predicted_default_rate": 0.1616,
+    "mean_default_probability": 0.2179
   }
 }
