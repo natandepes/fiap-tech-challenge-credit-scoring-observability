@@ -11,6 +11,7 @@ VALIDATED_DIR = DATA_DIR / "validated"
 QUARANTINE_DIR = DATA_DIR / "quarantine"
 SAMPLE_DIR = DATA_DIR / "sample"
 MONTHLY_PRODUCTION_DIR = PRODUCTION_DIR / "monthly"
+PREDICTIONS_DIR = PRODUCTION_DIR / "predictions"
 SIMULATION_DIR = DATA_DIR / "simulation"
 
 MODELS_DIR = PROJECT_ROOT / "models"
@@ -44,6 +45,8 @@ SAMPLE_SIZE = 500
 ID_COLUMN = "application_id"
 TARGET_COLUMN = "loan_status"
 MONTH_COLUMN = "month"
+PROBABILITY_COLUMN = "default_probability"
+PREDICTION_COLUMN = "predicted_default"
 DECISION_THRESHOLD = 0.5
 
 CATEGORY_DOMAINS = {
