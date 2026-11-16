@@ -1,0 +1,218 @@
+[
+  {
+    "month": "2026-02",
+    "type": "data_drift",
+    "subject": "loan_int_rate",
+    "value": 0.1677,
+    "threshold": 0.1,
+    "severity": "warning"
+  },
+  {
+    "month": "2026-02",
+    "type": "performance",
+    "subject": "roc_auc_drop",
+    "value": 0.0671,
+    "threshold": 0.05,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-03",
+    "type": "data_drift",
+    "subject": "loan_int_rate",
+    "value": 0.8748,
+    "threshold": 0.1,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-03",
+    "type": "performance",
+    "subject": "roc_auc_drop",
+    "value": 0.0975,
+    "threshold": 0.05,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-03",
+    "type": "performance",
+    "subject": "recall_drop",
+    "value": 0.146,
+    "threshold": 0.1,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-03",
+    "type": "calibration",
+    "subject": "observed_minus_predicted_default_rate",
+    "value": 0.0786,
+    "threshold": 0.05,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-04",
+    "type": "data_drift",
+    "subject": "loan_int_rate",
+    "value": 1.7497,
+    "threshold": 0.1,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-04",
+    "type": "data_drift",
+    "subject": "loan_amnt",
+    "value": 0.1648,
+    "threshold": 0.1,
+    "severity": "warning"
+  },
+  {
+    "month": "2026-04",
+    "type": "prediction_drift",
+    "subject": "default_probability",
+    "value": 0.1539,
+    "threshold": 0.1,
+    "severity": "warning"
+  },
+  {
+    "month": "2026-04",
+    "type": "performance",
+    "subject": "roc_auc_drop",
+    "value": 0.0955,
+    "threshold": 0.05,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-04",
+    "type": "performance",
+    "subject": "recall_drop",
+    "value": 0.1791,
+    "threshold": 0.1,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-04",
+    "type": "calibration",
+    "subject": "observed_minus_predicted_default_rate",
+    "value": 0.0989,
+    "threshold": 0.05,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-05",
+    "type": "data_drift",
+    "subject": "loan_int_rate",
+    "value": 1.9661,
+    "threshold": 0.1,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-05",
+    "type": "data_drift",
+    "subject": "loan_amnt",
+    "value": 0.1626,
+    "threshold": 0.1,
+    "severity": "warning"
+  },
+  {
+    "month": "2026-05",
+    "type": "data_drift",
+    "subject": "person_income",
+    "value": 0.1114,
+    "threshold": 0.1,
+    "severity": "warning"
+  },
+  {
+    "month": "2026-05",
+    "type": "data_drift",
+    "subject": "person_home_ownership",
+    "value": 0.1065,
+    "threshold": 0.1,
+    "severity": "warning"
+  },
+  {
+    "month": "2026-05",
+    "type": "prediction_drift",
+    "subject": "default_probability",
+    "value": 0.2476,
+    "threshold": 0.1,
+    "severity": "warning"
+  },
+  {
+    "month": "2026-05",
+    "type": "performance",
+    "subject": "roc_auc_drop",
+    "value": 0.0935,
+    "threshold": 0.05,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-05",
+    "type": "performance",
+    "subject": "recall_drop",
+    "value": 0.174,
+    "threshold": 0.1,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-05",
+    "type": "calibration",
+    "subject": "observed_minus_predicted_default_rate",
+    "value": 0.1348,
+    "threshold": 0.05,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-06",
+    "type": "data_drift",
+    "subject": "loan_int_rate",
+    "value": 2.698,
+    "threshold": 0.1,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-06",
+    "type": "data_drift",
+    "subject": "loan_amnt",
+    "value": 0.2192,
+    "threshold": 0.1,
+    "severity": "warning"
+  },
+  {
+    "month": "2026-06",
+    "type": "data_drift",
+    "subject": "person_home_ownership",
+    "value": 0.1867,
+    "threshold": 0.1,
+    "severity": "warning"
+  },
+  {
+    "month": "2026-06",
+    "type": "prediction_drift",
+    "subject": "default_probability",
+    "value": 0.3552,
+    "threshold": 0.1,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-06",
+    "type": "performance",
+    "subject": "roc_auc_drop",
+    "value": 0.1068,
+    "threshold": 0.05,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-06",
+    "type": "performance",
+    "subject": "recall_drop",
+    "value": 0.2238,
+    "threshold": 0.1,
+    "severity": "critical"
+  },
+  {
+    "month": "2026-06",
+    "type": "calibration",
+    "subject": "observed_minus_predicted_default_rate",
+    "value": 0.1828,
+    "threshold": 0.05,
+    "severity": "critical"
+  }
+]
