@@ -1,31 +1,33 @@
 index,application_id,column,check,failure_case
-16,84b3be1a57df3e05,(record),no_duplicate_records,
-98,4309bc4de7bc8505,(record),no_duplicate_records,
-144,e316a060061378f1,(record),no_duplicate_records,
-161,6c228ff51a40ab92,(record),no_duplicate_records,
-200,replay0555969427,(record),no_duplicate_records,
-201,replay0200480540,(record),no_duplicate_records,
-202,replay0839069730,(record),no_duplicate_records,
+95,bb73ba0786ff4bb0,(record),credit_history_within_working_life,
+13,80d2109df90130f1,(record),credit_history_within_working_life,
+179,3b48ed9ec51cde28,(record),credit_history_within_working_life,
+176,92e84efd39859ae5,(record),credit_history_within_working_life,
+177,c95a9434e74e8660,(record),loan_to_income_consistent,
+151,54a48d3145d7acff,(record),loan_to_income_consistent,
+100,628a0805006d4f6f,(record),loan_to_income_consistent,
+75,c20cb4489220fd4a,(record),loan_to_income_consistent,
+51,a50aa4d4838195b4,(record),loan_to_income_consistent,
+38,160200acf42b2fe0,(record),loan_to_income_consistent,
+,,scoring_request_contract,column_in_schema,national_id
 203,replay0801630523,(record),no_duplicate_records,
-13,80d2109df90130f1,(record),employment_within_working_life,
+202,replay0839069730,(record),no_duplicate_records,
+201,replay0200480540,(record),no_duplicate_records,
+200,replay0555969427,(record),no_duplicate_records,
+161,6c228ff51a40ab92,(record),no_duplicate_records,
+144,e316a060061378f1,(record),no_duplicate_records,
+98,4309bc4de7bc8505,(record),no_duplicate_records,
+16,84b3be1a57df3e05,(record),no_duplicate_records,
 21,0903258bd255d8d0,(record),employment_within_working_life,
+13,80d2109df90130f1,(record),employment_within_working_life,
 176,92e84efd39859ae5,(record),employment_within_working_life,
 179,3b48ed9ec51cde28,(record),employment_within_working_life,
 182,5383659a9c2f7afd,(record),employment_within_working_life,
 185,0504cf66ffebf1cb,(record),employment_within_working_life,
-13,80d2109df90130f1,(record),credit_history_within_working_life,
-95,bb73ba0786ff4bb0,(record),credit_history_within_working_life,
-176,92e84efd39859ae5,(record),credit_history_within_working_life,
-179,3b48ed9ec51cde28,(record),credit_history_within_working_life,
-38,160200acf42b2fe0,(record),loan_to_income_consistent,
-51,a50aa4d4838195b4,(record),loan_to_income_consistent,
-75,c20cb4489220fd4a,(record),loan_to_income_consistent,
-100,628a0805006d4f6f,(record),loan_to_income_consistent,
-151,54a48d3145d7acff,(record),loan_to_income_consistent,
-177,c95a9434e74e8660,(record),loan_to_income_consistent,
-,,scoring_request_contract,column_in_schema,national_id
+,,loan_amnt,greater_than(0),"TypeError(""'>' not supported between instances of 'str' and 'int'"")"
 116,dd974e8f25f76598,loan_amnt,coerce_dtype('float64'),unknown
 199,968fe2a92e510427,loan_amnt,coerce_dtype('float64'),unknown
+131,968fe2a92e510427,loan_grade,"isin(['A', 'B', 'C', 'D', 'E', 'F', 'G'])",Z
 84,,application_id,not_nullable,
 28,f0ec782ae6d8a923,application_id,field_uniqueness,f0ec782ae6d8a923
 102,f0ec782ae6d8a923,application_id,field_uniqueness,f0ec782ae6d8a923
@@ -53,6 +55,4 @@ index,application_id,column,check,failure_case
 24,448395da4481c8d5,person_home_ownership,"isin(['RENT', 'MORTGAGE', 'OWN', 'OTHER'])",UNKNOWN
 68,6e9413f6e1685795,person_home_ownership,"isin(['RENT', 'MORTGAGE', 'OWN', 'OTHER'])",UNKNOWN
 37,e29d0f3ff6cc15b2,loan_grade,"isin(['A', 'B', 'C', 'D', 'E', 'F', 'G'])",Z
-131,968fe2a92e510427,loan_grade,"isin(['A', 'B', 'C', 'D', 'E', 'F', 'G'])",Z
-,,loan_amnt,greater_than(0),"TypeError(""Invalid comparison between dtype=str and int"")"
-,,loan_amnt,less_than_or_equal_to(1000000),"TypeError(""Invalid comparison between dtype=str and int"")"
+,,loan_amnt,less_than_or_equal_to(1000000),"TypeError(""'<=' not supported between instances of 'str' and 'int'"")"

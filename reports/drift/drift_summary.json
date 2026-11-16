@@ -1,0 +1,76 @@
+{
+  "reference_holdout_baseline": {
+    "roc_auc": 0.9357,
+    "recall": 0.7101,
+    "precision": 0.9537,
+    "brier_score": 0.0587,
+    "observed_default_rate": 0.2171,
+    "mean_default_probability": 0.2179,
+    "predicted_default_rate": 0.1616
+  },
+  "latest_month": "2026-06",
+  "drifted_features_latest_month": [
+    {
+      "feature": "loan_int_rate",
+      "psi": 2.698,
+      "psi_band": "major"
+    },
+    {
+      "feature": "loan_amnt",
+      "psi": 0.2192,
+      "psi_band": "moderate"
+    },
+    {
+      "feature": "person_home_ownership",
+      "psi": 0.1867,
+      "psi_band": "moderate"
+    }
+  ],
+  "alerts_by_month": {
+    "2026-01": 0,
+    "2026-02": 2,
+    "2026-03": 4,
+    "2026-04": 6,
+    "2026-05": 8,
+    "2026-06": 7
+  },
+  "detection_against_injection": {
+    "month": "2026-06",
+    "injected": [
+      "loan_amnt",
+      "loan_int_rate",
+      "loan_percent_income",
+      "person_home_ownership",
+      "person_income"
+    ],
+    "drifted": {
+      "flagged": [
+        "loan_amnt",
+        "loan_int_rate",
+        "person_home_ownership"
+      ],
+      "missed": [
+        "loan_percent_income",
+        "person_income"
+      ],
+      "false_positives": []
+    },
+    "significant_change": {
+      "flagged": [
+        "loan_amnt",
+        "loan_int_rate",
+        "loan_percent_income",
+        "person_home_ownership",
+        "person_income"
+      ],
+      "missed": [],
+      "false_positives": []
+    }
+  },
+  "evidently_reports": [
+    "data_drift_2026-01.html",
+    "data_drift_2026-06.html",
+    "model_health_2026-01.html",
+    "model_health_2026-06.html"
+  ]
+}

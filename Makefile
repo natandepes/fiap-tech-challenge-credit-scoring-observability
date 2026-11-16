@@ -1,4 +1,4 @@
-.PHONY: install data batches validate-good validate-bad train test lint stage1 clean
+.PHONY: install data batches validate-good validate-bad train simulate score drift test lint stage1 stage2 all clean
 
 install:
 	uv sync
@@ -19,6 +19,15 @@ validate-bad: batches
 train:
 	uv run python -m credit_scoring.model.train
 
+simulate:
+	uv run python -m credit_scoring.drift.simulate
+
+score:
+	uv run python -m credit_scoring.model.score
+
+drift:
+	uv run python -m credit_scoring.drift.detect
+
 test:
 	uv run pytest -q
 
@@ -29,6 +38,10 @@ lint:
 stage1: data train validate-good
 	-$(MAKE) validate-bad
 
+stage2: simulate score drift
+
+all: stage1 stage2
+
 clean:
-	rm -rf data/raw data/reference data/production data/batches data/validated data/quarantine
+	rm -rf data/raw data/reference data/production data/batches data/validated data/quarantine data/simulation
 	rm -rf models logs reports

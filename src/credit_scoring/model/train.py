@@ -22,6 +22,7 @@ from sklearn.preprocessing import OrdinalEncoder
 from credit_scoring.config import (
     CATEGORICAL_FEATURES,
     CATEGORY_DOMAINS,
+    DECISION_THRESHOLD,
     MODEL_FEATURES,
     MODEL_PATH,
     MODEL_REPORTS_DIR,
@@ -36,7 +37,6 @@ from credit_scoring.contracts.credit_contract import LABELED_CREDIT_CONTRACT
 from credit_scoring.contracts.enforcement import enforce_contract
 from credit_scoring.pipeline_log import get_pipeline_logger
 
-DECISION_THRESHOLD = 0.5
 PERMUTATION_REPEATS = 5
 
 
@@ -71,6 +71,7 @@ def classification_metrics(y_true: pd.Series, default_probability: pd.Series) ->
         "f1": f1_score(y_true, predicted_default),
         "observed_default_rate": y_true.mean(),
         "predicted_default_rate": predicted_default.mean(),
+        "mean_default_probability": np.mean(default_probability),
     }
     return {name: round(float(value), 4) for name, value in metrics.items()}
 
@@ -113,17 +114,21 @@ def write_reports(metrics: dict, importance: pd.DataFrame, training_rows: int) -
     importance.to_csv(MODEL_REPORTS_DIR / "feature_importance.csv", index=False)
 
 
-def train_baseline() -> None:
-    log = get_pipeline_logger("train")
-    reference = enforce_contract(pd.read_parquet(REFERENCE_PATH), LABELED_CREDIT_CONTRACT)
-    log.info("reference_contract_passed", extra={"rows": len(reference)})
-
-    train, holdout = train_test_split(
+def split_train_holdout(reference: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    return train_test_split(
         reference,
         test_size=MODEL_TEST_FRACTION,
         stratify=reference[TARGET_COLUMN],
         random_state=RANDOM_SEED,
     )
+
+
+def train_baseline() -> None:
+    log = get_pipeline_logger("train")
+    reference = enforce_contract(pd.read_parquet(REFERENCE_PATH), LABELED_CREDIT_CONTRACT)
+    log.info("reference_contract_passed", extra={"rows": len(reference)})
+
+    train, holdout = split_train_holdout(reference)
     model = build_model().fit(train[MODEL_FEATURES], train[TARGET_COLUMN])
     default_probability = model.predict_proba(holdout[MODEL_FEATURES])[:, 1]
     metrics = classification_metrics(holdout[TARGET_COLUMN], default_probability)
