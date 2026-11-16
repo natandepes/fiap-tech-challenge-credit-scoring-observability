@@ -10,11 +10,14 @@ BATCHES_DIR = DATA_DIR / "batches"
 VALIDATED_DIR = DATA_DIR / "validated"
 QUARANTINE_DIR = DATA_DIR / "quarantine"
 SAMPLE_DIR = DATA_DIR / "sample"
+MONTHLY_PRODUCTION_DIR = PRODUCTION_DIR / "monthly"
+SIMULATION_DIR = DATA_DIR / "simulation"
 
 MODELS_DIR = PROJECT_ROOT / "models"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 VALIDATION_REPORTS_DIR = REPORTS_DIR / "validation"
 MODEL_REPORTS_DIR = REPORTS_DIR / "model"
+DRIFT_REPORTS_DIR = REPORTS_DIR / "drift"
 LOGS_DIR = PROJECT_ROOT / "logs"
 
 KAGGLE_DATASET = "laotse/credit-risk-dataset"
@@ -30,6 +33,8 @@ RAW_CURATION_FAILURE_CASES_PATH = VALIDATION_REPORTS_DIR / "raw_curation_failure
 RAW_REJECTED_ROWS_PATH = QUARANTINE_DIR / "raw_rejected_rows.csv"
 MODEL_PATH = MODELS_DIR / "baseline_model.joblib"
 PIPELINE_LOG_PATH = LOGS_DIR / "pipeline.jsonl"
+CONCEPT_DRIFT_TRUTH_PATH = SIMULATION_DIR / "concept_drift_ground_truth.parquet"
+SIMULATION_MANIFEST_PATH = DRIFT_REPORTS_DIR / "simulation_manifest.json"
 
 RANDOM_SEED = 42
 PRODUCTION_FRACTION = 0.4
@@ -38,6 +43,7 @@ SAMPLE_SIZE = 500
 
 ID_COLUMN = "application_id"
 TARGET_COLUMN = "loan_status"
+MONTH_COLUMN = "month"
 DECISION_THRESHOLD = 0.5
 
 CATEGORY_DOMAINS = {

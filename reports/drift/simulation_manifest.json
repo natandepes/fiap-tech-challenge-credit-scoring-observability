@@ -1,0 +1,99 @@
+{
+  "random_seed": 42,
+  "source": "data/production/production_base.parquet",
+  "data_drifted_features": [
+    "person_income",
+    "person_home_ownership",
+    "loan_amnt",
+    "loan_int_rate",
+    "loan_percent_income"
+  ],
+  "concept_drift": "stress defaults: P(y=1|X) rises with debt burden and housing exposure",
+  "shock_at_full_severity": {
+    "interest_rate_hike_pp": 4.0,
+    "nominal_inflation": 0.4,
+    "new_profile_share": 0.4,
+    "new_profile_income_factor": [
+      0.5,
+      0.8
+    ],
+    "new_profile_home_ownership": "RENT",
+    "stress_default_probability": 0.9,
+    "stress_burden_floor": 0.05,
+    "stress_burden_ceiling": 0.35,
+    "stress_exposure_by_home_ownership": [
+      [
+        "RENT",
+        1.0
+      ],
+      [
+        "OTHER",
+        1.0
+      ],
+      [
+        "MORTGAGE",
+        0.5
+      ],
+      [
+        "OWN",
+        0.25
+      ]
+    ]
+  },
+  "months": [
+    {
+      "month": "2026-01",
+      "shock_severity": 0.0,
+      "rows": 1900,
+      "default_rate": 0.2389,
+      "default_rate_without_concept_drift": 0.2389,
+      "concept_drift_defaults": 0,
+      "new_profile_share": 0.0
+    },
+    {
+      "month": "2026-02",
+      "shock_severity": 0.2,
+      "rows": 1900,
+      "default_rate": 0.2684,
+      "default_rate_without_concept_drift": 0.2368,
+      "concept_drift_defaults": 60,
+      "new_profile_share": 0.0768
+    },
+    {
+      "month": "2026-03",
+      "shock_severity": 0.4,
+      "rows": 1900,
+      "default_rate": 0.3574,
+      "default_rate_without_concept_drift": 0.29,
+      "concept_drift_defaults": 128,
+      "new_profile_share": 0.1863
+    },
+    {
+      "month": "2026-04",
+      "shock_severity": 0.6,
+      "rows": 1900,
+      "default_rate": 0.3984,
+      "default_rate_without_concept_drift": 0.3105,
+      "concept_drift_defaults": 167,
+      "new_profile_share": 0.2353
+    },
+    {
+      "month": "2026-05",
+      "shock_severity": 0.8,
+      "rows": 1899,
+      "default_rate": 0.4666,
+      "default_rate_without_concept_drift": 0.3612,
+      "concept_drift_defaults": 200,
+      "new_profile_share": 0.3312
+    },
+    {
+      "month": "2026-06",
+      "shock_severity": 1.0,
+      "rows": 1899,
+      "default_rate": 0.5392,
+      "default_rate_without_concept_drift": 0.377,
+      "concept_drift_defaults": 308,
+      "new_profile_share": 0.4076
+    }
+  ]
+}
