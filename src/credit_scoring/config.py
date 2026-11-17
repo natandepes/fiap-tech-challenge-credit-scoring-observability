@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -19,6 +20,7 @@ REPORTS_DIR = PROJECT_ROOT / "reports"
 VALIDATION_REPORTS_DIR = REPORTS_DIR / "validation"
 MODEL_REPORTS_DIR = REPORTS_DIR / "model"
 DRIFT_REPORTS_DIR = REPORTS_DIR / "drift"
+MONITORING_REPORTS_DIR = REPORTS_DIR / "monitoring"
 LOGS_DIR = PROJECT_ROOT / "logs"
 
 KAGGLE_DATASET = "laotse/credit-risk-dataset"
@@ -40,6 +42,7 @@ FEATURE_DRIFT_PATH = DRIFT_REPORTS_DIR / "feature_drift_by_month.csv"
 MODEL_HEALTH_PATH = DRIFT_REPORTS_DIR / "model_health_by_month.csv"
 DRIFT_ALERTS_PATH = DRIFT_REPORTS_DIR / "alerts.json"
 DRIFT_SUMMARY_PATH = DRIFT_REPORTS_DIR / "drift_summary.json"
+METRICS_SNAPSHOT_PATH = MONITORING_REPORTS_DIR / "metrics.prom"
 
 RANDOM_SEED = 42
 PRODUCTION_FRACTION = 0.4
@@ -98,3 +101,6 @@ STATISTICAL_TEST_ALPHA = 0.05
 ROC_AUC_DROP_ALERT = 0.05
 RECALL_DROP_ALERT = 0.10
 CALIBRATION_GAP_ALERT = 0.05
+
+PUSHGATEWAY_URL = os.environ.get("PUSHGATEWAY_URL", "localhost:9091")
+PUSHGATEWAY_JOB = "credit_scoring_pipeline"
