@@ -17,6 +17,7 @@ from credit_scoring.config import (
 )
 from credit_scoring.contracts.credit_contract import SCORING_REQUEST_CONTRACT
 from credit_scoring.contracts.enforcement import enforce_contract
+from credit_scoring.observability.step import tracked_step
 from credit_scoring.pipeline_log import get_pipeline_logger
 
 
@@ -37,6 +38,7 @@ def score_month(model, month: str) -> pd.DataFrame:
     return score(model, requests).assign(**{MONTH_COLUMN: month})
 
 
+@tracked_step("score")
 def score_production() -> None:
     log = get_pipeline_logger("score")
     model = joblib.load(MODEL_PATH)

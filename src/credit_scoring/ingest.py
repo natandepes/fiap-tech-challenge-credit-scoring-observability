@@ -11,6 +11,7 @@ from credit_scoring.contracts.credit_contract import (
     SCORING_REQUEST_CONTRACT,
 )
 from credit_scoring.contracts.enforcement import DataContractViolation, enforce_contract
+from credit_scoring.observability.step import tracked_step
 from credit_scoring.pipeline_log import get_pipeline_logger
 
 CONTRACTS = {"scoring": SCORING_REQUEST_CONTRACT, "labeled": LABELED_CREDIT_CONTRACT}
@@ -54,6 +55,7 @@ def accept(batch: pd.DataFrame, batch_name: str) -> Path:
     return destination
 
 
+@tracked_step("ingest")
 def ingest(path: Path, contract_key: str) -> int:
     log = get_pipeline_logger("ingest")
     contract = CONTRACTS[contract_key]

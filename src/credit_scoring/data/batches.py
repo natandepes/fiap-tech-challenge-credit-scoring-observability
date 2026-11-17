@@ -8,6 +8,7 @@ from credit_scoring.config import (
     RANDOM_SEED,
     TARGET_COLUMN,
 )
+from credit_scoring.observability.step import tracked_step
 from credit_scoring.pipeline_log import get_pipeline_logger
 
 BATCH_SIZE = 200
@@ -85,6 +86,7 @@ def inject_anomalies(batch: pd.DataFrame, rng: np.random.Generator) -> pd.DataFr
     return leak_pii_column(corrupted, rng)
 
 
+@tracked_step("batches")
 def build_demo_batches() -> None:
     log = get_pipeline_logger("batches")
     rng = np.random.default_rng(RANDOM_SEED)

@@ -6,8 +6,14 @@ import pandas as pd
 
 from credit_scoring.config import (
     CONCEPT_DRIFT_TRUTH_PATH,
+    COUNTERFACTUAL_SUFFIX,
+    DRIFT_ALERTS_PATH,
     DRIFT_REPORTS_DIR,
+    DRIFT_SUMMARY_PATH,
+    FEATURE_DRIFT_PATH,
+    HEALTH_METRICS,
     ID_COLUMN,
+    MODEL_HEALTH_PATH,
     MODEL_PATH,
     MONTH_COLUMN,
     MONTHLY_PRODUCTION_DIR,
@@ -31,21 +37,12 @@ from credit_scoring.drift.scenario import PRODUCTION_MONTHS
 from credit_scoring.drift.statistics import feature_drift_table
 from credit_scoring.model.score import score
 from credit_scoring.model.train import classification_metrics, split_train_holdout
+from credit_scoring.observability.step import tracked_step
 from credit_scoring.pipeline_log import get_pipeline_logger
 
 EVIDENTLY_DIR = DRIFT_REPORTS_DIR / "evidently"
 HTML_REPORT_MONTHS = (PRODUCTION_MONTHS[0], PRODUCTION_MONTHS[-1])
-HEALTH_METRICS = [
-    "roc_auc",
-    "recall",
-    "precision",
-    "brier_score",
-    "observed_default_rate",
-    "mean_default_probability",
-    "predicted_default_rate",
-]
 COUNTERFACTUAL_LABEL = "loan_status_without_concept_drift"
-COUNTERFACTUAL_SUFFIX = "_without_concept_drift"
 
 
 @dataclass(frozen=True)
@@ -136,12 +133,10 @@ def write_outputs(checks: list[MonthCheck], baseline: dict) -> dict:
     DRIFT_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     feature_drift = pd.concat([check.feature_drift for check in checks], ignore_index=True)
     feature_drift.insert(0, MONTH_COLUMN, feature_drift.pop(MONTH_COLUMN))
-    feature_drift.to_csv(DRIFT_REPORTS_DIR / "feature_drift_by_month.csv", index=False)
-    pd.DataFrame([check.health for check in checks]).to_csv(
-        DRIFT_REPORTS_DIR / "model_health_by_month.csv", index=False
-    )
+    feature_drift.to_csv(FEATURE_DRIFT_PATH, index=False)
+    pd.DataFrame([check.health for check in checks]).to_csv(MODEL_HEALTH_PATH, index=False)
     alerts = [alert for check in checks for alert in check.alerts]
-    (DRIFT_REPORTS_DIR / "alerts.json").write_text(json.dumps(alerts, indent=2))
+    DRIFT_ALERTS_PATH.write_text(json.dumps(alerts, indent=2))
 
     latest = checks[-1]
     drifted = latest.feature_drift[latest.feature_drift["drifted"]]
@@ -153,10 +148,11 @@ def write_outputs(checks: list[MonthCheck], baseline: dict) -> dict:
         "detection_against_injection": detection_against_injection(latest),
         "evidently_reports": sorted(str(path.name) for path in EVIDENTLY_DIR.glob("*.html")),
     }
-    (DRIFT_REPORTS_DIR / "drift_summary.json").write_text(json.dumps(summary, indent=2))
+    DRIFT_SUMMARY_PATH.write_text(json.dumps(summary, indent=2))
     return summary
 
 
+@tracked_step("drift")
 def detect_drift() -> None:
     log = get_pipeline_logger("drift")
     model = joblib.load(MODEL_PATH)

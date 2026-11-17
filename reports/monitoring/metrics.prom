@@ -1,0 +1,497 @@
+# HELP credit_pipeline_step_runs_total Pipeline step executions by outcome
+# TYPE credit_pipeline_step_runs_total counter
+credit_pipeline_step_runs_total{status="succeeded",step="download"} 1.0
+credit_pipeline_step_runs_total{status="succeeded",step="prepare"} 1.0
+credit_pipeline_step_runs_total{status="succeeded",step="train"} 1.0
+credit_pipeline_step_runs_total{status="succeeded",step="batches"} 2.0
+credit_pipeline_step_runs_total{status="succeeded",step="ingest"} 2.0
+credit_pipeline_step_runs_total{status="succeeded",step="simulate"} 1.0
+credit_pipeline_step_runs_total{status="succeeded",step="score"} 1.0
+credit_pipeline_step_runs_total{status="succeeded",step="drift"} 1.0
+# HELP credit_pipeline_step_last_success 1 if the latest run of the step succeeded, 0 if it failed
+# TYPE credit_pipeline_step_last_success gauge
+credit_pipeline_step_last_success{step="download"} 1.0
+credit_pipeline_step_last_success{step="prepare"} 1.0
+credit_pipeline_step_last_success{step="train"} 1.0
+credit_pipeline_step_last_success{step="batches"} 1.0
+credit_pipeline_step_last_success{step="ingest"} 1.0
+credit_pipeline_step_last_success{step="simulate"} 1.0
+credit_pipeline_step_last_success{step="score"} 1.0
+credit_pipeline_step_last_success{step="drift"} 1.0
+# HELP credit_pipeline_step_last_duration_seconds Wall-clock duration of the latest run
+# TYPE credit_pipeline_step_last_duration_seconds gauge
+credit_pipeline_step_last_duration_seconds{step="download"} 0.44
+credit_pipeline_step_last_duration_seconds{step="prepare"} 0.334
+credit_pipeline_step_last_duration_seconds{step="train"} 0.803
+credit_pipeline_step_last_duration_seconds{step="batches"} 0.037
+credit_pipeline_step_last_duration_seconds{step="ingest"} 0.066
+credit_pipeline_step_last_duration_seconds{step="simulate"} 0.837
+credit_pipeline_step_last_duration_seconds{step="score"} 0.734
+credit_pipeline_step_last_duration_seconds{step="drift"} 4.028
+# HELP credit_pipeline_step_last_cpu_seconds CPU time used by the latest run
+# TYPE credit_pipeline_step_last_cpu_seconds gauge
+credit_pipeline_step_last_cpu_seconds{step="download"} 0.042
+credit_pipeline_step_last_cpu_seconds{step="prepare"} 0.304
+credit_pipeline_step_last_cpu_seconds{step="train"} 3.475
+credit_pipeline_step_last_cpu_seconds{step="batches"} 0.058
+credit_pipeline_step_last_cpu_seconds{step="ingest"} 0.058
+credit_pipeline_step_last_cpu_seconds{step="simulate"} 2.23
+credit_pipeline_step_last_cpu_seconds{step="score"} 1.907
+credit_pipeline_step_last_cpu_seconds{step="drift"} 3.927
+# HELP credit_pipeline_step_last_peak_memory_bytes Peak resident memory of the process during the latest run
+# TYPE credit_pipeline_step_last_peak_memory_bytes gauge
+credit_pipeline_step_last_peak_memory_bytes{step="download"} 5.2056064e+07
+credit_pipeline_step_last_peak_memory_bytes{step="prepare"} 2.78564864e+08
+credit_pipeline_step_last_peak_memory_bytes{step="train"} 3.26086656e+08
+credit_pipeline_step_last_peak_memory_bytes{step="batches"} 2.07355904e+08
+credit_pipeline_step_last_peak_memory_bytes{step="ingest"} 1.3000704e+08
+credit_pipeline_step_last_peak_memory_bytes{step="simulate"} 3.14855424e+08
+credit_pipeline_step_last_peak_memory_bytes{step="score"} 2.92794368e+08
+credit_pipeline_step_last_peak_memory_bytes{step="drift"} 4.69262336e+08
+# HELP credit_pipeline_step_last_rows_processed Rows reported by the latest run's events
+# TYPE credit_pipeline_step_last_rows_processed gauge
+credit_pipeline_step_last_rows_processed{step="download"} 0.0
+credit_pipeline_step_last_rows_processed{step="prepare"} 28495.0
+credit_pipeline_step_last_rows_processed{step="train"} 17097.0
+credit_pipeline_step_last_rows_processed{step="batches"} 404.0
+credit_pipeline_step_last_rows_processed{step="ingest"} 204.0
+credit_pipeline_step_last_rows_processed{step="simulate"} 11398.0
+credit_pipeline_step_last_rows_processed{step="score"} 11398.0
+credit_pipeline_step_last_rows_processed{step="drift"} 11398.0
+# HELP credit_pipeline_step_last_timestamp_seconds Unix time at which the latest run finished
+# TYPE credit_pipeline_step_last_timestamp_seconds gauge
+credit_pipeline_step_last_timestamp_seconds{step="download"} 1.794881672918572e+09
+credit_pipeline_step_last_timestamp_seconds{step="prepare"} 1.794881674982667e+09
+credit_pipeline_step_last_timestamp_seconds{step="train"} 1.794881676923103e+09
+credit_pipeline_step_last_timestamp_seconds{step="batches"} 1.794881678248306e+09
+credit_pipeline_step_last_timestamp_seconds{step="ingest"} 1.794881678724793e+09
+credit_pipeline_step_last_timestamp_seconds{step="simulate"} 1.794881680011054e+09
+credit_pipeline_step_last_timestamp_seconds{step="score"} 1.794881680098423e+09
+credit_pipeline_step_last_timestamp_seconds{step="drift"} 1.794881686772372e+09
+# HELP credit_ingest_batches_total Batches gated by the data contract
+# TYPE credit_ingest_batches_total counter
+credit_ingest_batches_total{outcome="accepted"} 1.0
+credit_ingest_batches_total{outcome="rejected"} 1.0
+# HELP credit_ingest_rows_total Rows in batches gated by the data contract
+# TYPE credit_ingest_rows_total counter
+credit_ingest_rows_total{outcome="accepted"} 200.0
+credit_ingest_rows_total{outcome="rejected"} 204.0
+# HELP credit_contract_check_failures Failure cases per data contract check in the latest rejected batch
+# TYPE credit_contract_check_failures gauge
+credit_contract_check_failures{batch="bad_batch",check="no_duplicate_records",column="(record)",contract="scoring_request_contract"} 8.0
+credit_contract_check_failures{batch="bad_batch",check="loan_to_income_consistent",column="(record)",contract="scoring_request_contract"} 6.0
+credit_contract_check_failures{batch="bad_batch",check="employment_within_working_life",column="(record)",contract="scoring_request_contract"} 6.0
+credit_contract_check_failures{batch="bad_batch",check="in_range(18, 100)",column="person_age",contract="scoring_request_contract"} 6.0
+credit_contract_check_failures{batch="bad_batch",check="not_nullable",column="person_income",contract="scoring_request_contract"} 5.0
+credit_contract_check_failures{batch="bad_batch",check="credit_history_within_working_life",column="(record)",contract="scoring_request_contract"} 4.0
+credit_contract_check_failures{batch="bad_batch",check="field_uniqueness",column="application_id",contract="scoring_request_contract"} 4.0
+credit_contract_check_failures{batch="bad_batch",check="greater_than(0)",column="person_income",contract="scoring_request_contract"} 3.0
+credit_contract_check_failures{batch="bad_batch",check="isin(['RENT', 'MORTGAGE', 'OWN', 'OTHER'])",column="person_home_ownership",contract="scoring_request_contract"} 3.0
+credit_contract_check_failures{batch="bad_batch",check="isin(['A', 'B', 'C', 'D', 'E', 'F', 'G'])",column="loan_grade",contract="scoring_request_contract"} 2.0
+credit_contract_check_failures{batch="bad_batch",check="less_than_or_equal_to(100)",column="loan_int_rate",contract="scoring_request_contract"} 2.0
+credit_contract_check_failures{batch="bad_batch",check="dtype('float64')",column="loan_amnt",contract="scoring_request_contract"} 2.0
+credit_contract_check_failures{batch="bad_batch",check="coerce_dtype('float64')",column="loan_amnt",contract="scoring_request_contract"} 2.0
+credit_contract_check_failures{batch="bad_batch",check="greater_than(0)",column="loan_amnt",contract="scoring_request_contract"} 1.0
+credit_contract_check_failures{batch="bad_batch",check="not_nullable",column="application_id",contract="scoring_request_contract"} 1.0
+credit_contract_check_failures{batch="bad_batch",check="less_than_or_equal_to(1000000)",column="loan_amnt",contract="scoring_request_contract"} 1.0
+credit_contract_check_failures{batch="bad_batch",check="column_in_schema",column="scoring_request_contract",contract="scoring_request_contract"} 1.0
+# HELP credit_curation_rows Rows of the raw dataset by curation outcome
+# TYPE credit_curation_rows gauge
+credit_curation_rows{outcome="raw"} 32581.0
+credit_curation_rows{outcome="duplicate"} 165.0
+credit_curation_rows{outcome="rejected"} 3921.0
+credit_curation_rows{outcome="curated"} 28495.0
+# HELP credit_scoring_batch_latency_seconds Time to validate and score a monthly batch in the latest scoring run
+# TYPE credit_scoring_batch_latency_seconds gauge
+credit_scoring_batch_latency_seconds{month="2026-01"} 0.0985
+credit_scoring_batch_latency_seconds{month="2026-02"} 0.0259
+credit_scoring_batch_latency_seconds{month="2026-03"} 0.026
+credit_scoring_batch_latency_seconds{month="2026-04"} 0.024399999999999998
+credit_scoring_batch_latency_seconds{month="2026-05"} 0.0256
+credit_scoring_batch_latency_seconds{month="2026-06"} 0.026199999999999998
+# HELP credit_feature_psi PSI of a feature vs. reference
+# TYPE credit_feature_psi gauge
+credit_feature_psi{feature="loan_amnt",month="2026-01"} 0.0136
+credit_feature_psi{feature="loan_percent_income",month="2026-01"} 0.008
+credit_feature_psi{feature="loan_int_rate",month="2026-01"} 0.0074
+credit_feature_psi{feature="person_emp_length",month="2026-01"} 0.0041
+credit_feature_psi{feature="loan_grade",month="2026-01"} 0.003
+credit_feature_psi{feature="cb_person_cred_hist_length",month="2026-01"} 0.0023
+credit_feature_psi{feature="loan_intent",month="2026-01"} 0.0023
+credit_feature_psi{feature="person_home_ownership",month="2026-01"} 0.0016
+credit_feature_psi{feature="person_income",month="2026-01"} 0.001
+credit_feature_psi{feature="cb_person_default_on_file",month="2026-01"} 0.0003
+credit_feature_psi{feature="loan_int_rate",month="2026-02"} 0.1677
+credit_feature_psi{feature="person_income",month="2026-02"} 0.0203
+credit_feature_psi{feature="loan_amnt",month="2026-02"} 0.0117
+credit_feature_psi{feature="person_emp_length",month="2026-02"} 0.0057
+credit_feature_psi{feature="loan_grade",month="2026-02"} 0.0054
+credit_feature_psi{feature="cb_person_cred_hist_length",month="2026-02"} 0.0052
+credit_feature_psi{feature="loan_percent_income",month="2026-02"} 0.0042
+credit_feature_psi{feature="person_home_ownership",month="2026-02"} 0.004
+credit_feature_psi{feature="loan_intent",month="2026-02"} 0.0006
+credit_feature_psi{feature="cb_person_default_on_file",month="2026-02"} 0.0003
+credit_feature_psi{feature="loan_int_rate",month="2026-03"} 0.8748
+credit_feature_psi{feature="loan_amnt",month="2026-03"} 0.0628
+credit_feature_psi{feature="person_income",month="2026-03"} 0.0471
+credit_feature_psi{feature="person_home_ownership",month="2026-03"} 0.0371
+credit_feature_psi{feature="loan_percent_income",month="2026-03"} 0.027
+credit_feature_psi{feature="person_emp_length",month="2026-03"} 0.0072
+credit_feature_psi{feature="cb_person_cred_hist_length",month="2026-03"} 0.0059
+credit_feature_psi{feature="loan_intent",month="2026-03"} 0.0028
+credit_feature_psi{feature="loan_grade",month="2026-03"} 0.0011
+credit_feature_psi{feature="cb_person_default_on_file",month="2026-03"} 0.0007
+credit_feature_psi{feature="loan_int_rate",month="2026-04"} 1.7497
+credit_feature_psi{feature="loan_amnt",month="2026-04"} 0.1648
+credit_feature_psi{feature="person_income",month="2026-04"} 0.0652
+credit_feature_psi{feature="person_home_ownership",month="2026-04"} 0.0571
+credit_feature_psi{feature="loan_percent_income",month="2026-04"} 0.0328
+credit_feature_psi{feature="person_emp_length",month="2026-04"} 0.0091
+credit_feature_psi{feature="cb_person_cred_hist_length",month="2026-04"} 0.0027
+credit_feature_psi{feature="loan_grade",month="2026-04"} 0.0009
+credit_feature_psi{feature="loan_intent",month="2026-04"} 0.0008
+credit_feature_psi{feature="cb_person_default_on_file",month="2026-04"} 0.0002
+credit_feature_psi{feature="loan_int_rate",month="2026-05"} 1.9661
+credit_feature_psi{feature="loan_amnt",month="2026-05"} 0.1626
+credit_feature_psi{feature="person_income",month="2026-05"} 0.1114
+credit_feature_psi{feature="person_home_ownership",month="2026-05"} 0.1065
+credit_feature_psi{feature="loan_percent_income",month="2026-05"} 0.0806
+credit_feature_psi{feature="loan_intent",month="2026-05"} 0.0071
+credit_feature_psi{feature="cb_person_cred_hist_length",month="2026-05"} 0.0048
+credit_feature_psi{feature="loan_grade",month="2026-05"} 0.0026
+credit_feature_psi{feature="person_emp_length",month="2026-05"} 0.0022
+credit_feature_psi{feature="cb_person_default_on_file",month="2026-05"} 0.0009
+credit_feature_psi{feature="loan_int_rate",month="2026-06"} 2.698
+credit_feature_psi{feature="loan_amnt",month="2026-06"} 0.2192
+credit_feature_psi{feature="person_home_ownership",month="2026-06"} 0.1867
+credit_feature_psi{feature="person_income",month="2026-06"} 0.0852
+credit_feature_psi{feature="loan_percent_income",month="2026-06"} 0.0812
+credit_feature_psi{feature="person_emp_length",month="2026-06"} 0.0102
+credit_feature_psi{feature="cb_person_cred_hist_length",month="2026-06"} 0.0055
+credit_feature_psi{feature="loan_grade",month="2026-06"} 0.0025
+credit_feature_psi{feature="loan_intent",month="2026-06"} 0.0021
+credit_feature_psi{feature="cb_person_default_on_file",month="2026-06"} 0.0
+# HELP credit_feature_drift_p_value p-value of the KS / chi-square test vs. reference
+# TYPE credit_feature_drift_p_value gauge
+credit_feature_drift_p_value{feature="loan_amnt",month="2026-01",test="kolmogorov_smirnov"} 0.0295484556514586
+credit_feature_drift_p_value{feature="loan_percent_income",month="2026-01",test="kolmogorov_smirnov"} 0.2604070715552933
+credit_feature_drift_p_value{feature="loan_int_rate",month="2026-01",test="kolmogorov_smirnov"} 0.6554429308116363
+credit_feature_drift_p_value{feature="person_emp_length",month="2026-01",test="kolmogorov_smirnov"} 0.2078895754663692
+credit_feature_drift_p_value{feature="loan_grade",month="2026-01",test="chi_square"} 0.5217761289234597
+credit_feature_drift_p_value{feature="cb_person_cred_hist_length",month="2026-01",test="kolmogorov_smirnov"} 0.999767083719517
+credit_feature_drift_p_value{feature="loan_intent",month="2026-01",test="chi_square"} 0.5475337509189321
+credit_feature_drift_p_value{feature="person_home_ownership",month="2026-01",test="chi_square"} 0.5294823060857001
+credit_feature_drift_p_value{feature="person_income",month="2026-01",test="kolmogorov_smirnov"} 0.974117366705636
+credit_feature_drift_p_value{feature="cb_person_default_on_file",month="2026-01",test="chi_square"} 0.5090588135072878
+credit_feature_drift_p_value{feature="loan_int_rate",month="2026-02",test="kolmogorov_smirnov"} 4.146600072698222e-26
+credit_feature_drift_p_value{feature="person_income",month="2026-02",test="kolmogorov_smirnov"} 4.441851458651432e-06
+credit_feature_drift_p_value{feature="loan_amnt",month="2026-02",test="kolmogorov_smirnov"} 3.5965227303198233e-16
+credit_feature_drift_p_value{feature="person_emp_length",month="2026-02",test="kolmogorov_smirnov"} 0.3215954671243788
+credit_feature_drift_p_value{feature="loan_grade",month="2026-02",test="chi_square"} 0.1936870078693001
+credit_feature_drift_p_value{feature="cb_person_cred_hist_length",month="2026-02",test="kolmogorov_smirnov"} 0.2610377044229197
+credit_feature_drift_p_value{feature="loan_percent_income",month="2026-02",test="kolmogorov_smirnov"} 0.4472346511607938
+credit_feature_drift_p_value{feature="person_home_ownership",month="2026-02",test="chi_square"} 0.0816051628477793
+credit_feature_drift_p_value{feature="loan_intent",month="2026-02",test="chi_square"} 0.962584260368427
+credit_feature_drift_p_value{feature="cb_person_default_on_file",month="2026-02",test="chi_square"} 0.5090588135072878
+credit_feature_drift_p_value{feature="loan_int_rate",month="2026-03",test="kolmogorov_smirnov"} 6.0705691126215805e-64
+credit_feature_drift_p_value{feature="loan_amnt",month="2026-03",test="kolmogorov_smirnov"} 1.7819485410729085e-33
+credit_feature_drift_p_value{feature="person_income",month="2026-03",test="kolmogorov_smirnov"} 1.3492302662348239e-11
+credit_feature_drift_p_value{feature="person_home_ownership",month="2026-03",test="chi_square"} 1.7463509319518592e-13
+credit_feature_drift_p_value{feature="loan_percent_income",month="2026-03",test="kolmogorov_smirnov"} 4.529092650884224e-06
+credit_feature_drift_p_value{feature="person_emp_length",month="2026-03",test="kolmogorov_smirnov"} 0.5161784802733975
+credit_feature_drift_p_value{feature="cb_person_cred_hist_length",month="2026-03",test="kolmogorov_smirnov"} 0.5401993111395946
+credit_feature_drift_p_value{feature="loan_intent",month="2026-03",test="chi_square"} 0.4609539102821279
+credit_feature_drift_p_value{feature="loan_grade",month="2026-03",test="chi_square"} 0.9123418293039888
+credit_feature_drift_p_value{feature="cb_person_default_on_file",month="2026-03",test="chi_square"} 0.3006071131440229
+credit_feature_drift_p_value{feature="loan_int_rate",month="2026-04",test="kolmogorov_smirnov"} 1.2227239023611008e-130
+credit_feature_drift_p_value{feature="loan_amnt",month="2026-04",test="kolmogorov_smirnov"} 4.2214324141902676e-47
+credit_feature_drift_p_value{feature="person_income",month="2026-04",test="kolmogorov_smirnov"} 1.5688276356370225e-18
+credit_feature_drift_p_value{feature="person_home_ownership",month="2026-04",test="chi_square"} 1.4755448670985668e-20
+credit_feature_drift_p_value{feature="loan_percent_income",month="2026-04",test="kolmogorov_smirnov"} 4.2841034431353435e-09
+credit_feature_drift_p_value{feature="person_emp_length",month="2026-04",test="kolmogorov_smirnov"} 0.5808851024290058
+credit_feature_drift_p_value{feature="cb_person_cred_hist_length",month="2026-04",test="kolmogorov_smirnov"} 0.7517199963999746
+credit_feature_drift_p_value{feature="loan_grade",month="2026-04",test="chi_square"} 0.9537686678373448
+credit_feature_drift_p_value{feature="loan_intent",month="2026-04",test="chi_square"} 0.93301133306298
+credit_feature_drift_p_value{feature="cb_person_default_on_file",month="2026-04",test="chi_square"} 0.5989873527332912
+credit_feature_drift_p_value{feature="loan_int_rate",month="2026-05",test="kolmogorov_smirnov"} 7.152706090179359e-225
+credit_feature_drift_p_value{feature="loan_amnt",month="2026-05",test="kolmogorov_smirnov"} 2.3246226975135167e-76
+credit_feature_drift_p_value{feature="person_income",month="2026-05",test="kolmogorov_smirnov"} 2.0696918733791757e-25
+credit_feature_drift_p_value{feature="person_home_ownership",month="2026-05",test="chi_square"} 1.3413860179080963e-37
+credit_feature_drift_p_value{feature="loan_percent_income",month="2026-05",test="kolmogorov_smirnov"} 7.34946444891699e-20
+credit_feature_drift_p_value{feature="loan_intent",month="2026-05",test="chi_square"} 0.0306354593391478
+credit_feature_drift_p_value{feature="cb_person_cred_hist_length",month="2026-05",test="kolmogorov_smirnov"} 0.8740714965442498
+credit_feature_drift_p_value{feature="loan_grade",month="2026-05",test="chi_square"} 0.6288044063197875
+credit_feature_drift_p_value{feature="person_emp_length",month="2026-05",test="kolmogorov_smirnov"} 0.9973035287455956
+credit_feature_drift_p_value{feature="cb_person_default_on_file",month="2026-05",test="chi_square"} 0.2447142387696039
+credit_feature_drift_p_value{feature="loan_int_rate",month="2026-06",test="kolmogorov_smirnov"} 2.1524413137e-314
+credit_feature_drift_p_value{feature="loan_amnt",month="2026-06",test="kolmogorov_smirnov"} 1.4214228365400717e-74
+credit_feature_drift_p_value{feature="person_home_ownership",month="2026-06",test="chi_square"} 4.0221230778189464e-64
+credit_feature_drift_p_value{feature="person_income",month="2026-06",test="kolmogorov_smirnov"} 2.114416485826774e-24
+credit_feature_drift_p_value{feature="loan_percent_income",month="2026-06",test="kolmogorov_smirnov"} 3.2752427257869035e-14
+credit_feature_drift_p_value{feature="person_emp_length",month="2026-06",test="kolmogorov_smirnov"} 0.3409047551516652
+credit_feature_drift_p_value{feature="cb_person_cred_hist_length",month="2026-06",test="kolmogorov_smirnov"} 0.1620258955747077
+credit_feature_drift_p_value{feature="loan_grade",month="2026-06",test="chi_square"} 0.6177500607850759
+credit_feature_drift_p_value{feature="loan_intent",month="2026-06",test="chi_square"} 0.5962271175045948
+credit_feature_drift_p_value{feature="cb_person_default_on_file",month="2026-06",test="chi_square"} 0.8446323594665179
+# HELP credit_feature_drifted 1 when the feature's PSI crosses the drift threshold
+# TYPE credit_feature_drifted gauge
+credit_feature_drifted{feature="loan_amnt",month="2026-01"} 0.0
+credit_feature_drifted{feature="loan_percent_income",month="2026-01"} 0.0
+credit_feature_drifted{feature="loan_int_rate",month="2026-01"} 0.0
+credit_feature_drifted{feature="person_emp_length",month="2026-01"} 0.0
+credit_feature_drifted{feature="loan_grade",month="2026-01"} 0.0
+credit_feature_drifted{feature="cb_person_cred_hist_length",month="2026-01"} 0.0
+credit_feature_drifted{feature="loan_intent",month="2026-01"} 0.0
+credit_feature_drifted{feature="person_home_ownership",month="2026-01"} 0.0
+credit_feature_drifted{feature="person_income",month="2026-01"} 0.0
+credit_feature_drifted{feature="cb_person_default_on_file",month="2026-01"} 0.0
+credit_feature_drifted{feature="loan_int_rate",month="2026-02"} 1.0
+credit_feature_drifted{feature="person_income",month="2026-02"} 0.0
+credit_feature_drifted{feature="loan_amnt",month="2026-02"} 0.0
+credit_feature_drifted{feature="person_emp_length",month="2026-02"} 0.0
+credit_feature_drifted{feature="loan_grade",month="2026-02"} 0.0
+credit_feature_drifted{feature="cb_person_cred_hist_length",month="2026-02"} 0.0
+credit_feature_drifted{feature="loan_percent_income",month="2026-02"} 0.0
+credit_feature_drifted{feature="person_home_ownership",month="2026-02"} 0.0
+credit_feature_drifted{feature="loan_intent",month="2026-02"} 0.0
+credit_feature_drifted{feature="cb_person_default_on_file",month="2026-02"} 0.0
+credit_feature_drifted{feature="loan_int_rate",month="2026-03"} 1.0
+credit_feature_drifted{feature="loan_amnt",month="2026-03"} 0.0
+credit_feature_drifted{feature="person_income",month="2026-03"} 0.0
+credit_feature_drifted{feature="person_home_ownership",month="2026-03"} 0.0
+credit_feature_drifted{feature="loan_percent_income",month="2026-03"} 0.0
+credit_feature_drifted{feature="person_emp_length",month="2026-03"} 0.0
+credit_feature_drifted{feature="cb_person_cred_hist_length",month="2026-03"} 0.0
+credit_feature_drifted{feature="loan_intent",month="2026-03"} 0.0
+credit_feature_drifted{feature="loan_grade",month="2026-03"} 0.0
+credit_feature_drifted{feature="cb_person_default_on_file",month="2026-03"} 0.0
+credit_feature_drifted{feature="loan_int_rate",month="2026-04"} 1.0
+credit_feature_drifted{feature="loan_amnt",month="2026-04"} 1.0
+credit_feature_drifted{feature="person_income",month="2026-04"} 0.0
+credit_feature_drifted{feature="person_home_ownership",month="2026-04"} 0.0
+credit_feature_drifted{feature="loan_percent_income",month="2026-04"} 0.0
+credit_feature_drifted{feature="person_emp_length",month="2026-04"} 0.0
+credit_feature_drifted{feature="cb_person_cred_hist_length",month="2026-04"} 0.0
+credit_feature_drifted{feature="loan_grade",month="2026-04"} 0.0
+credit_feature_drifted{feature="loan_intent",month="2026-04"} 0.0
+credit_feature_drifted{feature="cb_person_default_on_file",month="2026-04"} 0.0
+credit_feature_drifted{feature="loan_int_rate",month="2026-05"} 1.0
+credit_feature_drifted{feature="loan_amnt",month="2026-05"} 1.0
+credit_feature_drifted{feature="person_income",month="2026-05"} 1.0
+credit_feature_drifted{feature="person_home_ownership",month="2026-05"} 1.0
+credit_feature_drifted{feature="loan_percent_income",month="2026-05"} 0.0
+credit_feature_drifted{feature="loan_intent",month="2026-05"} 0.0
+credit_feature_drifted{feature="cb_person_cred_hist_length",month="2026-05"} 0.0
+credit_feature_drifted{feature="loan_grade",month="2026-05"} 0.0
+credit_feature_drifted{feature="person_emp_length",month="2026-05"} 0.0
+credit_feature_drifted{feature="cb_person_default_on_file",month="2026-05"} 0.0
+credit_feature_drifted{feature="loan_int_rate",month="2026-06"} 1.0
+credit_feature_drifted{feature="loan_amnt",month="2026-06"} 1.0
+credit_feature_drifted{feature="person_home_ownership",month="2026-06"} 1.0
+credit_feature_drifted{feature="person_income",month="2026-06"} 0.0
+credit_feature_drifted{feature="loan_percent_income",month="2026-06"} 0.0
+credit_feature_drifted{feature="person_emp_length",month="2026-06"} 0.0
+credit_feature_drifted{feature="cb_person_cred_hist_length",month="2026-06"} 0.0
+credit_feature_drifted{feature="loan_grade",month="2026-06"} 0.0
+credit_feature_drifted{feature="loan_intent",month="2026-06"} 0.0
+credit_feature_drifted{feature="cb_person_default_on_file",month="2026-06"} 0.0
+# HELP credit_drift_alert_value Observed value of a raised drift or degradation alert
+# TYPE credit_drift_alert_value gauge
+credit_drift_alert_value{month="2026-02",severity="warning",subject="loan_int_rate",type="data_drift"} 0.1677
+credit_drift_alert_value{month="2026-02",severity="critical",subject="roc_auc_drop",type="performance"} 0.0671
+credit_drift_alert_value{month="2026-03",severity="critical",subject="loan_int_rate",type="data_drift"} 0.8748
+credit_drift_alert_value{month="2026-03",severity="critical",subject="roc_auc_drop",type="performance"} 0.0975
+credit_drift_alert_value{month="2026-03",severity="critical",subject="recall_drop",type="performance"} 0.146
+credit_drift_alert_value{month="2026-03",severity="critical",subject="observed_minus_predicted_default_rate",type="calibration"} 0.0786
+credit_drift_alert_value{month="2026-04",severity="critical",subject="loan_int_rate",type="data_drift"} 1.7497
+credit_drift_alert_value{month="2026-04",severity="warning",subject="loan_amnt",type="data_drift"} 0.1648
+credit_drift_alert_value{month="2026-04",severity="warning",subject="default_probability",type="prediction_drift"} 0.1539
+credit_drift_alert_value{month="2026-04",severity="critical",subject="roc_auc_drop",type="performance"} 0.0955
+credit_drift_alert_value{month="2026-04",severity="critical",subject="recall_drop",type="performance"} 0.1791
+credit_drift_alert_value{month="2026-04",severity="critical",subject="observed_minus_predicted_default_rate",type="calibration"} 0.0989
+credit_drift_alert_value{month="2026-05",severity="critical",subject="loan_int_rate",type="data_drift"} 1.9661
+credit_drift_alert_value{month="2026-05",severity="warning",subject="loan_amnt",type="data_drift"} 0.1626
+credit_drift_alert_value{month="2026-05",severity="warning",subject="person_income",type="data_drift"} 0.1114
+credit_drift_alert_value{month="2026-05",severity="warning",subject="person_home_ownership",type="data_drift"} 0.1065
+credit_drift_alert_value{month="2026-05",severity="warning",subject="default_probability",type="prediction_drift"} 0.2476
+credit_drift_alert_value{month="2026-05",severity="critical",subject="roc_auc_drop",type="performance"} 0.0935
+credit_drift_alert_value{month="2026-05",severity="critical",subject="recall_drop",type="performance"} 0.174
+credit_drift_alert_value{month="2026-05",severity="critical",subject="observed_minus_predicted_default_rate",type="calibration"} 0.1348
+credit_drift_alert_value{month="2026-06",severity="critical",subject="loan_int_rate",type="data_drift"} 2.698
+credit_drift_alert_value{month="2026-06",severity="warning",subject="loan_amnt",type="data_drift"} 0.2192
+credit_drift_alert_value{month="2026-06",severity="warning",subject="person_home_ownership",type="data_drift"} 0.1867
+credit_drift_alert_value{month="2026-06",severity="critical",subject="default_probability",type="prediction_drift"} 0.3552
+credit_drift_alert_value{month="2026-06",severity="critical",subject="roc_auc_drop",type="performance"} 0.1068
+credit_drift_alert_value{month="2026-06",severity="critical",subject="recall_drop",type="performance"} 0.2238
+credit_drift_alert_value{month="2026-06",severity="critical",subject="observed_minus_predicted_default_rate",type="calibration"} 0.1828
+# HELP credit_drift_alert_threshold Threshold crossed by a raised drift or degradation alert
+# TYPE credit_drift_alert_threshold gauge
+credit_drift_alert_threshold{month="2026-02",severity="warning",subject="loan_int_rate",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-02",severity="critical",subject="roc_auc_drop",type="performance"} 0.05
+credit_drift_alert_threshold{month="2026-03",severity="critical",subject="loan_int_rate",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-03",severity="critical",subject="roc_auc_drop",type="performance"} 0.05
+credit_drift_alert_threshold{month="2026-03",severity="critical",subject="recall_drop",type="performance"} 0.1
+credit_drift_alert_threshold{month="2026-03",severity="critical",subject="observed_minus_predicted_default_rate",type="calibration"} 0.05
+credit_drift_alert_threshold{month="2026-04",severity="critical",subject="loan_int_rate",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-04",severity="warning",subject="loan_amnt",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-04",severity="warning",subject="default_probability",type="prediction_drift"} 0.1
+credit_drift_alert_threshold{month="2026-04",severity="critical",subject="roc_auc_drop",type="performance"} 0.05
+credit_drift_alert_threshold{month="2026-04",severity="critical",subject="recall_drop",type="performance"} 0.1
+credit_drift_alert_threshold{month="2026-04",severity="critical",subject="observed_minus_predicted_default_rate",type="calibration"} 0.05
+credit_drift_alert_threshold{month="2026-05",severity="critical",subject="loan_int_rate",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-05",severity="warning",subject="loan_amnt",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-05",severity="warning",subject="person_income",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-05",severity="warning",subject="person_home_ownership",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-05",severity="warning",subject="default_probability",type="prediction_drift"} 0.1
+credit_drift_alert_threshold{month="2026-05",severity="critical",subject="roc_auc_drop",type="performance"} 0.05
+credit_drift_alert_threshold{month="2026-05",severity="critical",subject="recall_drop",type="performance"} 0.1
+credit_drift_alert_threshold{month="2026-05",severity="critical",subject="observed_minus_predicted_default_rate",type="calibration"} 0.05
+credit_drift_alert_threshold{month="2026-06",severity="critical",subject="loan_int_rate",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-06",severity="warning",subject="loan_amnt",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-06",severity="warning",subject="person_home_ownership",type="data_drift"} 0.1
+credit_drift_alert_threshold{month="2026-06",severity="critical",subject="default_probability",type="prediction_drift"} 0.1
+credit_drift_alert_threshold{month="2026-06",severity="critical",subject="roc_auc_drop",type="performance"} 0.05
+credit_drift_alert_threshold{month="2026-06",severity="critical",subject="recall_drop",type="performance"} 0.1
+credit_drift_alert_threshold{month="2026-06",severity="critical",subject="observed_minus_predicted_default_rate",type="calibration"} 0.05
+# HELP credit_monitoring_latest_month_info The most recent production month checked for drift
+# TYPE credit_monitoring_latest_month_info gauge
+credit_monitoring_latest_month_info{month="2026-06"} 1.0
+# HELP credit_model_roc_auc Model roc_auc per production month
+# TYPE credit_model_roc_auc gauge
+credit_model_roc_auc{ground_truth="observed",month="2026-01"} 0.9483
+credit_model_roc_auc{ground_truth="simulated_without_concept_drift",month="2026-01"} 0.9483
+credit_model_roc_auc{ground_truth="observed",month="2026-02"} 0.8686
+credit_model_roc_auc{ground_truth="simulated_without_concept_drift",month="2026-02"} 0.905
+credit_model_roc_auc{ground_truth="observed",month="2026-03"} 0.8382
+credit_model_roc_auc{ground_truth="simulated_without_concept_drift",month="2026-03"} 0.9147
+credit_model_roc_auc{ground_truth="observed",month="2026-04"} 0.8402
+credit_model_roc_auc{ground_truth="simulated_without_concept_drift",month="2026-04"} 0.9104
+credit_model_roc_auc{ground_truth="observed",month="2026-05"} 0.8422
+credit_model_roc_auc{ground_truth="simulated_without_concept_drift",month="2026-05"} 0.9082
+credit_model_roc_auc{ground_truth="observed",month="2026-06"} 0.8289
+credit_model_roc_auc{ground_truth="simulated_without_concept_drift",month="2026-06"} 0.9103
+# HELP credit_model_recall Model recall per production month
+# TYPE credit_model_recall gauge
+credit_model_recall{ground_truth="observed",month="2026-01"} 0.7379
+credit_model_recall{ground_truth="simulated_without_concept_drift",month="2026-01"} 0.7379
+credit_model_recall{ground_truth="observed",month="2026-02"} 0.6235
+credit_model_recall{ground_truth="simulated_without_concept_drift",month="2026-02"} 0.6956
+credit_model_recall{ground_truth="observed",month="2026-03"} 0.5641
+credit_model_recall{ground_truth="simulated_without_concept_drift",month="2026-03"} 0.6933
+credit_model_recall{ground_truth="observed",month="2026-04"} 0.531
+credit_model_recall{ground_truth="simulated_without_concept_drift",month="2026-04"} 0.6797
+credit_model_recall{ground_truth="observed",month="2026-05"} 0.5361
+credit_model_recall{ground_truth="simulated_without_concept_drift",month="2026-05"} 0.6822
+credit_model_recall{ground_truth="observed",month="2026-06"} 0.4863
+credit_model_recall{ground_truth="simulated_without_concept_drift",month="2026-06"} 0.6788
+# HELP credit_model_precision Model precision per production month
+# TYPE credit_model_precision gauge
+credit_model_precision{ground_truth="observed",month="2026-01"} 0.9599
+credit_model_precision{ground_truth="simulated_without_concept_drift",month="2026-01"} 0.9599
+credit_model_precision{ground_truth="observed",month="2026-02"} 0.9755
+credit_model_precision{ground_truth="simulated_without_concept_drift",month="2026-02"} 0.9601
+credit_model_precision{ground_truth="observed",month="2026-03"} 0.9672
+credit_model_precision{ground_truth="simulated_without_concept_drift",month="2026-03"} 0.9646
+credit_model_precision{ground_truth="observed",month="2026-04"} 0.9549
+credit_model_precision{ground_truth="simulated_without_concept_drift",month="2026-04"} 0.9525
+credit_model_precision{ground_truth="observed",month="2026-05"} 0.9855
+credit_model_precision{ground_truth="simulated_without_concept_drift",month="2026-05"} 0.971
+credit_model_precision{ground_truth="observed",month="2026-06"} 0.9803
+credit_model_precision{ground_truth="simulated_without_concept_drift",month="2026-06"} 0.9567
+# HELP credit_model_brier_score Model brier_score per production month
+# TYPE credit_model_brier_score gauge
+credit_model_brier_score{ground_truth="observed",month="2026-01"} 0.0559
+credit_model_brier_score{ground_truth="simulated_without_concept_drift",month="2026-01"} 0.0559
+credit_model_brier_score{ground_truth="observed",month="2026-02"} 0.0918
+credit_model_brier_score{ground_truth="simulated_without_concept_drift",month="2026-02"} 0.0694
+credit_model_brier_score{ground_truth="observed",month="2026-03"} 0.1341
+credit_model_brier_score{ground_truth="simulated_without_concept_drift",month="2026-03"} 0.08
+credit_model_brier_score{ground_truth="observed",month="2026-04"} 0.1526
+credit_model_brier_score{ground_truth="simulated_without_concept_drift",month="2026-04"} 0.0875
+credit_model_brier_score{ground_truth="observed",month="2026-05"} 0.1687
+credit_model_brier_score{ground_truth="simulated_without_concept_drift",month="2026-05"} 0.0957
+credit_model_brier_score{ground_truth="observed",month="2026-06"} 0.2067
+credit_model_brier_score{ground_truth="simulated_without_concept_drift",month="2026-06"} 0.0986
+# HELP credit_model_observed_default_rate Model observed_default_rate per production month
+# TYPE credit_model_observed_default_rate gauge
+credit_model_observed_default_rate{ground_truth="observed",month="2026-01"} 0.2389
+credit_model_observed_default_rate{ground_truth="simulated_without_concept_drift",month="2026-01"} 0.2389
+credit_model_observed_default_rate{ground_truth="observed",month="2026-02"} 0.2684
+credit_model_observed_default_rate{ground_truth="simulated_without_concept_drift",month="2026-02"} 0.2368
+credit_model_observed_default_rate{ground_truth="observed",month="2026-03"} 0.3574
+credit_model_observed_default_rate{ground_truth="simulated_without_concept_drift",month="2026-03"} 0.29
+credit_model_observed_default_rate{ground_truth="observed",month="2026-04"} 0.3984
+credit_model_observed_default_rate{ground_truth="simulated_without_concept_drift",month="2026-04"} 0.3105
+credit_model_observed_default_rate{ground_truth="observed",month="2026-05"} 0.4666
+credit_model_observed_default_rate{ground_truth="simulated_without_concept_drift",month="2026-05"} 0.3612
+credit_model_observed_default_rate{ground_truth="observed",month="2026-06"} 0.5392
+credit_model_observed_default_rate{ground_truth="simulated_without_concept_drift",month="2026-06"} 0.377
+# HELP credit_model_mean_default_probability Model mean_default_probability per production month
+# TYPE credit_model_mean_default_probability gauge
+credit_model_mean_default_probability{ground_truth="observed",month="2026-01"} 0.235
+credit_model_mean_default_probability{ground_truth="simulated_without_concept_drift",month="2026-01"} 0.235
+credit_model_mean_default_probability{ground_truth="observed",month="2026-02"} 0.2354
+credit_model_mean_default_probability{ground_truth="simulated_without_concept_drift",month="2026-02"} 0.2354
+credit_model_mean_default_probability{ground_truth="observed",month="2026-03"} 0.2788
+credit_model_mean_default_probability{ground_truth="simulated_without_concept_drift",month="2026-03"} 0.2788
+credit_model_mean_default_probability{ground_truth="observed",month="2026-04"} 0.2995
+credit_model_mean_default_probability{ground_truth="simulated_without_concept_drift",month="2026-04"} 0.2995
+credit_model_mean_default_probability{ground_truth="observed",month="2026-05"} 0.3318
+credit_model_mean_default_probability{ground_truth="simulated_without_concept_drift",month="2026-05"} 0.3318
+credit_model_mean_default_probability{ground_truth="observed",month="2026-06"} 0.3564
+credit_model_mean_default_probability{ground_truth="simulated_without_concept_drift",month="2026-06"} 0.3564
+# HELP credit_model_predicted_default_rate Model predicted_default_rate per production month
+# TYPE credit_model_predicted_default_rate gauge
+credit_model_predicted_default_rate{ground_truth="observed",month="2026-01"} 0.1837
+credit_model_predicted_default_rate{ground_truth="simulated_without_concept_drift",month="2026-01"} 0.1837
+credit_model_predicted_default_rate{ground_truth="observed",month="2026-02"} 0.1716
+credit_model_predicted_default_rate{ground_truth="simulated_without_concept_drift",month="2026-02"} 0.1716
+credit_model_predicted_default_rate{ground_truth="observed",month="2026-03"} 0.2084
+credit_model_predicted_default_rate{ground_truth="simulated_without_concept_drift",month="2026-03"} 0.2084
+credit_model_predicted_default_rate{ground_truth="observed",month="2026-04"} 0.2216
+credit_model_predicted_default_rate{ground_truth="simulated_without_concept_drift",month="2026-04"} 0.2216
+credit_model_predicted_default_rate{ground_truth="observed",month="2026-05"} 0.2538
+credit_model_predicted_default_rate{ground_truth="simulated_without_concept_drift",month="2026-05"} 0.2538
+credit_model_predicted_default_rate{ground_truth="observed",month="2026-06"} 0.2675
+credit_model_predicted_default_rate{ground_truth="simulated_without_concept_drift",month="2026-06"} 0.2675
+# HELP credit_production_scored_rows Applications scored in the month
+# TYPE credit_production_scored_rows gauge
+credit_production_scored_rows{month="2026-01"} 1900.0
+credit_production_scored_rows{month="2026-02"} 1900.0
+credit_production_scored_rows{month="2026-03"} 1900.0
+credit_production_scored_rows{month="2026-04"} 1900.0
+credit_production_scored_rows{month="2026-05"} 1899.0
+credit_production_scored_rows{month="2026-06"} 1899.0
+# HELP credit_drifted_features Features with PSI above the drift threshold
+# TYPE credit_drifted_features gauge
+credit_drifted_features{month="2026-01"} 0.0
+credit_drifted_features{month="2026-02"} 1.0
+credit_drifted_features{month="2026-03"} 1.0
+credit_drifted_features{month="2026-04"} 2.0
+credit_drifted_features{month="2026-05"} 4.0
+credit_drifted_features{month="2026-06"} 3.0
+# HELP credit_prediction_psi PSI of default_probability vs. reference
+# TYPE credit_prediction_psi gauge
+credit_prediction_psi{month="2026-01"} 0.0067
+credit_prediction_psi{month="2026-02"} 0.0271
+credit_prediction_psi{month="2026-03"} 0.0938
+credit_prediction_psi{month="2026-04"} 0.1539
+credit_prediction_psi{month="2026-05"} 0.2476
+credit_prediction_psi{month="2026-06"} 0.3552
+# HELP credit_target_psi PSI of the observed default label vs. reference
+# TYPE credit_target_psi gauge
+credit_target_psi{month="2026-01"} 0.0027
+credit_target_psi{month="2026-02"} 0.0144
+credit_target_psi{month="2026-03"} 0.0976
+credit_target_psi{month="2026-04"} 0.1578
+credit_target_psi{month="2026-05"} 0.2865
+credit_target_psi{month="2026-06"} 0.4638
+# HELP credit_model_baseline Model metric on the reference holdout
+# TYPE credit_model_baseline gauge
+credit_model_baseline{metric="roc_auc"} 0.9357
+credit_model_baseline{metric="recall"} 0.7101
+credit_model_baseline{metric="precision"} 0.9537
+credit_model_baseline{metric="brier_score"} 0.0587
+credit_model_baseline{metric="observed_default_rate"} 0.2171
+credit_model_baseline{metric="mean_default_probability"} 0.2179
+credit_model_baseline{metric="predicted_default_rate"} 0.1616

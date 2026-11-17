@@ -20,6 +20,7 @@ from credit_scoring.config import (
 )
 from credit_scoring.contracts.credit_contract import LABELED_CREDIT_CONTRACT
 from credit_scoring.contracts.enforcement import DataContractViolation, enforce_contract
+from credit_scoring.observability.step import tracked_step
 from credit_scoring.pipeline_log import get_pipeline_logger
 
 
@@ -74,6 +75,7 @@ def write_parquet(frame: pd.DataFrame, path) -> None:
     frame.to_parquet(path, index=False)
 
 
+@tracked_step("prepare")
 def prepare_datasets() -> None:
     log = get_pipeline_logger("prepare")
     raw = pd.read_csv(RAW_PATH)
