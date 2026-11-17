@@ -37,6 +37,7 @@ from credit_scoring.drift.scenario import PRODUCTION_MONTHS
 from credit_scoring.drift.statistics import feature_drift_table
 from credit_scoring.model.score import score
 from credit_scoring.model.train import classification_metrics, split_train_holdout
+from credit_scoring.observability.step import tracked_step
 from credit_scoring.pipeline_log import get_pipeline_logger
 
 EVIDENTLY_DIR = DRIFT_REPORTS_DIR / "evidently"
@@ -151,6 +152,7 @@ def write_outputs(checks: list[MonthCheck], baseline: dict) -> dict:
     return summary
 
 
+@tracked_step("drift")
 def detect_drift() -> None:
     log = get_pipeline_logger("drift")
     model = joblib.load(MODEL_PATH)

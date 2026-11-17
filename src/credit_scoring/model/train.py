@@ -35,6 +35,7 @@ from credit_scoring.config import (
 )
 from credit_scoring.contracts.credit_contract import LABELED_CREDIT_CONTRACT
 from credit_scoring.contracts.enforcement import enforce_contract
+from credit_scoring.observability.step import tracked_step
 from credit_scoring.pipeline_log import get_pipeline_logger
 
 PERMUTATION_REPEATS = 5
@@ -123,6 +124,7 @@ def split_train_holdout(reference: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataF
     )
 
 
+@tracked_step("train")
 def train_baseline() -> None:
     log = get_pipeline_logger("train")
     reference = enforce_contract(pd.read_parquet(REFERENCE_PATH), LABELED_CREDIT_CONTRACT)

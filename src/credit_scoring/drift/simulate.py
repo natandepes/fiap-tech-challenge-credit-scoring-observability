@@ -26,6 +26,7 @@ from credit_scoring.drift.scenario import (
     SHOCK_SEVERITY_BY_MONTH,
     EconomicShock,
 )
+from credit_scoring.observability.step import tracked_step
 from credit_scoring.pipeline_log import get_pipeline_logger
 
 RiskFunction = Callable[[pd.DataFrame], np.ndarray]
@@ -195,6 +196,7 @@ def concept_drift_truth(month: str, simulated: SimulatedMonth) -> pd.DataFrame:
     )
 
 
+@tracked_step("simulate")
 def simulate_production(shock: EconomicShock = DEFAULT_SHOCK) -> None:
     log = get_pipeline_logger("simulate")
     risk = model_risk_function(joblib.load(MODEL_PATH))

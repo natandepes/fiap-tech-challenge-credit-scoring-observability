@@ -5,6 +5,7 @@ from pathlib import Path
 import kagglehub
 
 from credit_scoring.config import KAGGLE_DATASET, RAW_FILE_NAME, RAW_FILE_SHA256, RAW_PATH
+from credit_scoring.observability.step import tracked_step
 from credit_scoring.pipeline_log import get_pipeline_logger
 
 
@@ -16,6 +17,7 @@ def is_cached() -> bool:
     return RAW_PATH.exists() and sha256_of(RAW_PATH) == RAW_FILE_SHA256
 
 
+@tracked_step("download")
 def download_raw_dataset() -> None:
     log = get_pipeline_logger("download")
     if is_cached():
