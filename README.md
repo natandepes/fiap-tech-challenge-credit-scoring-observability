@@ -14,10 +14,11 @@ make install   # create the virtual environment
 make stage1    # download, curate, split, train, then run the good and bad demo batches
 make stage2    # simulate six production months, score them, detect drift (needs stage1)
 make monitor-up  # start the Prometheus + Grafana monitoring stack (needs Docker)
+make stage4    # fairness audit of the model's decisions by age group (needs stage2)
 make stage3    # export pipeline, drift and model metrics and push them to the stack
-make pipeline  # stage1 + stage2 + stage3, no Docker needed (the metrics push is skipped with a warning)
+make pipeline  # stage1 + stage2 + stage4 + stage3, no Docker needed (the metrics push is skipped with a warning)
 make all       # monitor-up + pipeline: every stage plus the live dashboard
-make test      # contract, ingestion, simulation, drift detection and observability tests
+make test      # contract, ingestion, simulation, drift detection, observability and fairness tests
 make clean     # delete everything generated (data, model, logs, reports) to start from scratch
 ```
 
@@ -155,8 +156,9 @@ trains a scikit-learn pipeline on a seeded, stratified 75/25 split of the refere
 pipeline is an ordinal encoder with a fixed category list, feeding a `HistGradientBoostingClassifier`
 with default settings. The model is a means, not the deliverable, so it is not tuned.
 
-`person_age` is a protected attribute and is excluded from the features (see the governance
-section). It is still validated, because the contract enforces the legal minimum age.
+`person_age` is a protected attribute and is excluded from the features (see
+[bias mitigation](#bias-mitigation)). It is still validated, because the contract enforces the legal
+minimum age.
 
 Holdout metrics (`reports/model/model_card.json`): ROC AUC 0.936, average precision 0.882,
 accuracy 0.930, recall 0.710 at a 0.5 threshold.
@@ -503,6 +505,281 @@ The **Credit Scoring Observability** dashboard has four sections, and each panel
 | Infrastructure | Stack targets up, host CPU, memory, disk and uptime, peak memory per step |
 | Model drift and degradation | PSI heatmap by feature and month, alerts per month, ROC AUC and recall, calibration, prediction and target drift, recall with and without concept drift, scoring latency |
 
+## Stage 4: governance, LGPD and causality
+
+```bash
+make stage4   # fairness audit by age group, on the reference holdout and every production month
+```
+
+This section is the project's data protection plan under the LGPD (Lei 13.709/2018). It covers how
+personal data is handled, the legal basis for the credit decision, the retention plan, bias
+mitigation, a causal analysis of the degradation, and what to do when an alert fires. Where a
+measure is implemented, the code and the evidence are named. Where it is a recommendation for a
+real deployment, it says so.
+
+Roles, as they would be in a real lender: the fintech is the **controller** (*controlador*, Art. 5,
+VI). A credit bureau that supplies `cb_person_*` data is a separate controller. A cloud host for the
+pipeline would be a **processor** (*operador*). A **DPO** (*encarregado*, Art. 41) is the contact
+point for applicants and for the ANPD.
+
+### Personal data inventory
+
+The dataset has no direct identifiers: no name, CPF, address or phone number. It is still personal
+data. LGPD covers data about an *identifiable* person (Art. 5, I), and age, income, employment length
+and loan amount together can single out an applicant. So every column is treated as personal data.
+
+| Column(s) | Class | Use in this project |
+| --- | --- | --- |
+| `application_id` | Pseudonymous identifier | Joins applications, predictions and failure reports. Carries no information about the person |
+| `person_age` | Personal data, **protected attribute** (discrimination risk) | Contract check of the legal minimum age (18) and the fairness audit. **Not a model feature** |
+| `person_income`, `person_emp_length`, `person_home_ownership` | Personal, financial | Model features |
+| `loan_amnt`, `loan_int_rate`, `loan_percent_income`, `loan_grade` | Personal, financial (loan terms) | Model features |
+| `loan_intent` | Personal. The value `MEDICAL` reveals a health situation, which is **sensitive data** (Art. 5, II) | Model feature. See the open risk below |
+| `cb_person_default_on_file`, `cb_person_cred_hist_length` | Credit bureau data (Lei 12.414/2011, Cadastro Positivo) | Model features |
+| `loan_status` | Personal, outcome of the credit relationship | Training target and monitoring |
+| `national_id` (demo only) | Direct identifier | Never accepted. Injected into `bad_batch.csv` to show the contract blocking it |
+
+### How personal data is handled (privacy by design and by default)
+
+| Measure | LGPD principle | How it is implemented |
+| --- | --- | --- |
+| **Minimization by contract** | Necessity (Art. 6, III) | The data contract uses an exact schema (rule 1). A batch with any extra column, such as a leaked `national_id`, is rejected as a whole. Nothing reaches `data/validated/`. Collecting more than the model needs fails the pipeline by default |
+| **Pseudonymization** | Security (Art. 6, VII), Art. 13 | Rows get an opaque `application_id` (truncated SHA-256 of seed and row number), unrelated to any personal attribute. Failure reports, predictions and logs refer to applications only by this id |
+| **Protected attribute kept out of the model** | Non-discrimination (Art. 6, IX) | `person_age` is in `PROTECTED_ATTRIBUTES` (`config.py`) and excluded from `MODEL_FEATURES`. The model card records the exclusion. Age is used only to enforce the legal minimum age and to audit fairness |
+| **Purpose limitation** | Purpose (Art. 6, I) | Training uses only the reference dataset. Production data is used for scoring and monitoring and never for training. The two live in separate files |
+| **Aggregated observability** | Necessity, security | Logs hold counts, rates, paths, run ids and pseudonymous ids, never feature values. Prometheus metrics and the Grafana dashboard are aggregated by step, month and feature. Evidently reports show distributions, not applicants |
+| **Least exposure of rejected data** | Security, prevention (Art. 6, VIII) | Rejection reports record the broken rule and the column. For the leaked `national_id`, only the column name is recorded (`reports/validation/bad_batch_failure_cases.csv`). The values exist only in the git-ignored quarantine copy |
+| **No personal data in version control** | Security | `data/*` is git-ignored. Only a 500-row sample of the public, already pseudonymized reference dataset is committed for the tests |
+| **No international transfer** | Art. 33 | The whole stack (pipeline, Pushgateway, Prometheus, Grafana) runs locally in Docker. No SaaS receives data |
+| **Integrity of the source** | Data quality (Art. 6, V) | The raw file's SHA-256 is verified on download. The contract rejects impossible values, so wrong data about a person does not drive a decision |
+| **Traceability** | Accountability (Art. 6, X) | Every step has a `run_id`. Every rejected row is listed with the rule it broke. Every alert is in `reports/drift/alerts.json` and the log |
+
+**Needed before production (not implemented in this project):**
+
+- **Real tokenization.** The surrogate id here is derived from the row number. In production it
+  should be a random token issued by a vault that keeps the token → CPF mapping, with restricted
+  access and keys stored apart from the data.
+- **Access control.** Grafana allows anonymous read-only access so the demo needs no login. In
+  production: SSO, role-based access and an audit log. Quarantine is the most sensitive area (raw
+  rows as received) and should be restricted to data engineering.
+- **Encryption** at rest for `data/` and the Prometheus volume, and TLS between components.
+- **RIPD.** A data protection impact assessment (*Relatório de Impacto*, Art. 38) for the scoring
+  model, because it makes automated decisions about people with financial data. Also a record of
+  processing activities (Art. 37) and an incident response plan with notification to the ANPD and
+  the data subjects (Art. 48).
+- **Open risk: `loan_intent = MEDICAL`.** Health data is sensitive (Art. 11), and *proteção do
+  crédito* is not one of the legal bases Art. 11 allows for sensitive data. Options: replace the
+  category with a neutral one (e.g. `PERSONAL`), collect it only with specific, separate consent
+  (Art. 11, I), or drop it after measuring the impact (it is the 5th most important feature, with
+  0.042 AUC). This project keeps the column because it is part of the public dataset, but it should
+  be resolved before real use.
+
+### Legal basis for the credit decision
+
+| Processing | Legal basis | Why |
+| --- | --- | --- |
+| Scoring an application and deciding on it | **Art. 7, X — protection of credit** (*proteção do crédito*) | The basis written for credit analysis. It does not depend on consent |
+| Using the applicant's data to evaluate and grant the loan they requested | Art. 7, V — preliminary steps to a contract, at the data subject's request | The applicant asks for the loan |
+| Reading and reporting bureau data (`cb_person_*`) | Art. 7, X with Lei 12.414/2011 (Cadastro Positivo) | The Cadastro Positivo law governs credit history databases |
+| Keeping records after the decision | Art. 7, II — legal or regulatory obligation | Record keeping duties of financial institutions (e.g. Lei 9.613/1998, Art. 10) |
+| Monitoring the model (drift, performance, fairness) | Art. 7, IX — legitimate interest, limited to aggregated metrics | Needed to keep decisions correct and non-discriminatory. A legitimate interest assessment (Art. 10) should document it |
+
+Consent is deliberately **not** the basis for scoring. It can be withdrawn at any time (Art. 8, §5),
+and a lender that cannot score without it could not operate. Consent is reserved for optional
+purposes, such as using `loan_intent = MEDICAL` if it were kept.
+
+**Automated decisions (Art. 20).** A rejection made by the model alone is an automated decision
+that affects the applicant's interests. The applicant has the right to:
+
+- **request a review**, so a rejected or borderline application goes to a credit analyst;
+- **clear information on the criteria** (Art. 20, §1). `reports/model/model_card.json` lists the
+  features used and the excluded protected attribute, and `reports/model/feature_importance.csv`
+  ranks what drives the score. These are the basis for the explanation given to the applicant,
+  without disclosing the model itself (trade secret).
+
+The other data subject rights (Art. 18: confirmation, access, correction, anonymization, portability,
+information on sharing) are answered through the DPO. **Deletion is limited by retention duties**:
+records that the law requires the lender to keep are kept, then deleted (Art. 16, I).
+
+### Retention plan
+
+Each data store has a retention period and a way to dispose of it. Periods marked *project* are what
+this repository does. Periods marked *production* are the policy for a real deployment.
+
+| Data | Location | Contains | Retention | Disposal |
+| --- | --- | --- | --- | --- |
+| Raw dataset | `data/raw/` | All columns as published | *Project:* until `make clean`. *Production:* only until curation succeeds | Deleted. Rebuilt from the source by `make data` |
+| Reference dataset | `data/reference/` | Curated, pseudonymized training data | Life of the model version trained on it, plus the audit period | Deleted with the retired model version |
+| Production batches and predictions | `data/production/` | Applications, scores, decisions | *Production:* 5 years after the credit relationship ends (record keeping duty, Lei 9.613/1998). Negative records may not be shown to third parties after 5 years (CDC, Art. 43, §1) | Deleted, or anonymized for model statistics |
+| Credit history (bureau data) | `cb_person_*` columns | Payment history | Up to 15 years for positive history (Lei 12.414/2011, Art. 14) | Bureau's responsibility; the lender keeps only what it received for the decision |
+| Quarantine | `data/quarantine/` | Rejected rows **as received**, including leaked fields | *Production:* 30 days, enough to fix the source and replay | Deleted. Leaked direct identifiers (e.g. `national_id`) are purged at once and the source system is notified |
+| Validation failure reports | `reports/validation/` | Pseudonymous id, rule, offending value | 1 year, for data quality audits | Deleted |
+| Pipeline logs | `logs/pipeline.jsonl` | Events, counts, run ids, pseudonymous ids | 1 year | Deleted |
+| Monitoring metrics | Prometheus, Pushgateway | Aggregated metrics only | 30 days in Prometheus (`--storage.tsdb.retention.time=30d` in `monitoring/compose.yaml`) | Automatic expiry |
+| Drift, model and fairness reports | `reports/drift/`, `reports/model/`, `reports/governance/` | Aggregated statistics | Life of the model plus 5 years, as evidence of how decisions were made | Archived, then deleted |
+| Simulation ground truth | `data/simulation/` | Labels before concept drift | Exists only in this simulation | `make clean` |
+
+`make clean` deletes every generated store at once, so the project itself never keeps data longer
+than a run needs.
+
+### Bias mitigation
+
+**Protected attribute.** The dataset's only protected attribute is age. It has no gender, race or
+region, so those cannot be audited here. A real deployment would need them to be audited, even if
+they are never used as features.
+
+**What was done:**
+
+1. **Age is excluded from the model** (`PROTECTED_ATTRIBUTES` in `config.py`, recorded in the model
+   card).
+2. **Excluding age is not enough**, because other features can stand in for it. The audit measures
+   how strongly each numeric feature correlates with age (Spearman, on the reference dataset):
+
+   | Feature | Correlation with age | Strong proxy (≥ 0.5) |
+   | --- | --- | --- |
+   | `cb_person_cred_hist_length` | 0.80 | **yes** |
+   | `person_income` | 0.15 | no |
+   | `person_emp_length` | 0.10 | no |
+   | others | < 0.07 | no |
+
+   Credit history length is close to a copy of age: older people have had more time to build a
+   history. It is kept because it is a legitimate, regulated credit factor (Cadastro Positivo), but
+   it means the model can still treat age groups differently. Hence point 3.
+3. **The outcomes are audited by age group** (`credit_scoring.governance.fairness`), on the reference
+   holdout and on every production month, with the model's real decisions. The groups are 18–25,
+   26–35 and 36+. The checks are:
+
+   - **Disparate impact:** approval rate of the least approved group ÷ approval rate of the most
+     approved group. Below **0.8** (the four-fifths rule) is treated as discriminatory. The rule
+     comes from US practice. LGPD sets the principle (Art. 6, IX), not a number, so the rule is used
+     as the threshold.
+   - **False rejection gap:** difference between groups in the share of good payers who are
+     rejected. Alert at **5 pp**. These are the people a biased model harms.
+   - **Missed default gap:** difference in the share of defaults that are approved. Reported only.
+
+   Any breach logs a `fairness_alert` event. The audit's step status reaches the Stage 3 dashboard
+   like any other step.
+
+**Results** (`reports/governance/fairness_audit.json`, `reports/governance/fairness_by_age_group.csv`):
+
+| Dataset | Approval 18–25 | Approval 26–35 | Approval 36+ | Disparate impact | False rejection gap |
+| --- | --- | --- | --- | --- | --- |
+| Reference holdout | 82.4% | 85.0% | 85.5% | 0.96 | 0.8 pp |
+| 2026-01 | 80.4% | 83.2% | 80.3% | 0.97 | 0.7 pp |
+| 2026-03 | 78.4% | 79.9% | 79.5% | 0.98 | 0.5 pp |
+| 2026-06 | 72.6% | 75.0% | 69.3% | 0.92 | 1.4 pp |
+
+- **No group is discriminated against** in any dataset. The lowest disparate impact is 0.92 (June),
+  well above 0.8, and the false rejection gap never passes 1.4 pp. No `fairness_alert` is raised.
+- **Young applicants are approved slightly less often**, and they also default more (23.5% vs.
+  19.6% for 36+ in the holdout). The model's mean predicted probability follows the observed rate
+  in each group (0.233 vs. 0.235 for 18–25), so the gap reflects risk, not a penalty for age.
+- **The crisis hurts every group, not one in particular.** In June about half of the defaults are
+  approved in every group (missed default rates 49%–52%). Concept drift is a model-wide failure, so
+  the fix is retraining, not a group-specific adjustment.
+- The 36+ group has only about 200 applicants a month, so its monthly rates move by a few points by
+  chance alone. For small groups, a fairness alert should be confirmed over several months before
+  acting.
+
+**What happens if the audit fails:** the model version is not promoted, or is rolled back. Then the
+proxy features are reviewed (starting with credit history length), the impact of dropping or
+reweighting them is measured, and the decision threshold per group is not used as a quick fix (it
+would mean using age directly in the decision).
+
+### Causal analysis of the degradation
+
+Drift detection shows **what** changed. It does not show **why**. This section links the economic
+causes to the drifted features and to the damage, and separates what is causal from what is only
+correlated.
+
+Because the drift is simulated, the causes are known: `drift/scenario.py` is the intervention. That
+is what makes a causal claim possible here. A real lender would only see the effects and would have
+to infer the causes.
+
+```
+ economic cause            mechanism                         observed effect                model effect
+ ───────────────────────   ───────────────────────────────   ───────────────────────────    ──────────────────────────────
+ central bank rate hike ─> loan_int_rate +4 pp ────────────> loan_int_rate PSI 2.70 ──────> riskier loans, read correctly
+ unemployment, new      ─> poorer renters apply ───────────> home_ownership PSI 0.19, ────> riskier applicants, read correctly
+ customer profiles                                           income, loan-to-income
+ inflation (nominal)    ─> income and loan amount × 1.4 ───> loan_amnt PSI 0.22 ──────────> incomes look higher: risk underestimated
+ inflation (real)       ─> real disposable income falls ──> nothing in the inputs ────────> same features, more defaults: concept drift
+                           (not measured by any feature)     default rate 23.9% -> 53.9%
+```
+
+**Each cause and its effect on decisions.** The counterfactual labels (outcomes without concept
+drift) separate the damage. June, against the January control month:
+
+| | ROC AUC | Recall | What it isolates |
+| --- | --- | --- | --- |
+| January (control) | 0.948 | 0.738 | No crisis |
+| June, data drift only | 0.910 | 0.679 | Rate hike, new profiles, nominal inflation |
+| June, with concept drift | 0.829 | 0.486 | Plus the fall in real income |
+
+- **Real population changes** (rate hike, new profiles) cause most of the input drift, but little
+  of the damage. The model learned how interest rates and renting relate to risk, so it raises its
+  scores. The share of applications it rejects rises from 18% in January to 27% in June, and that
+  is the correct reaction.
+- **Nominal inflation** causes a moderate loss (AUC 0.948 → 0.910). The model learned a
+  *correlation*: higher income goes with lower risk. That is true in real money, not in nominal
+  money. When every income is inflated by 40%, the correlation stays in the model but the cause
+  behind it (more purchasing power) is gone. The damage is limited because the most important
+  feature, loan-to-income, is a ratio and inflation cancels out of it.
+- **The fall in real income** causes the severe loss (AUC → 0.829, recall → 0.486). The cause is a
+  variable the model does not have. It is a **hidden confounder**: it raises defaults without
+  changing any input. Input drift checks cannot see it. Only the outcome-based checks (performance
+  and calibration) detect it, and only after the outcomes are known.
+
+**Impact on decisions.** In June the model predicts a 35.6% default rate when 53.9% of applicants
+default, and approves about half of the loans that go into default. The lender takes much larger
+losses than it priced for, while the input drift alerts alone would not reveal how bad it is.
+
+**Correlation is not causation, in this project:**
+
+- **A drifted feature is not necessarily the cause of the damage.** `loan_int_rate` has by far the
+  largest PSI (2.70), but the model handles it correctly. The most damaging cause (real income) has
+  no drift signal at all. Ranking features by PSI is not ranking them by harm.
+- **A drifted feature can have several causes that cancel out.** `person_income` drifts less than
+  expected because inflation raises it and the new profiles lower it. A small PSI does not mean a
+  small cause.
+- **The model's correlations are only valid under the conditions they were learned in.** A credit
+  model is a set of correlations that held in the reference period. Inflation changed the meaning
+  of a feature (income) without changing its name, and the correlation stopped holding.
+- **How a real lender would test the causal story:** deflate incomes and amounts by an inflation
+  index (IPCA) and check that the income drift and part of the loss disappear. Compare cohorts
+  approved before and after the rate change. Look for a variable that measures real income
+  (e.g. debt service from bureau data) and check whether it explains the extra defaults.
+
+### What to do when an alert fires
+
+| Alert | Immediate action | Owner | Follow-up |
+| --- | --- | --- | --- |
+| `BatchRejectedByDataContract` | Batch stays in quarantine, nothing is scored | Data engineering | Fix the source and replay. A leaked direct identifier is purged and handled as a possible incident (Art. 48) |
+| `PipelineStepFailed`, `PipelineMetricsStale` | Do not use outputs from the failed run | Data engineering | Rerun after the fix. The `run_id` in the log locates the failure |
+| `FeatureDrift`, `PredictionDrift` (warning) | Investigate. The model keeps running | Data science | Check the cause (a real population change or nominal inflation) before acting |
+| `FeatureDrift` (critical) on an important feature | Send borderline applications (e.g. probability 0.3–0.7) to human review | Credit risk | Prepare retraining on recent data |
+| `ModelPerformanceDegraded`, `ModelMiscalibrated` | Tighten the decision threshold or roll back to the previous model version. Send rejections to human review | Credit risk + data science | **Retrain** on recent labeled data, validate, check fairness, then promote |
+| `fairness_alert` | Block the promotion of the model version, or roll back | Data science + DPO | Review proxy features. Document the decision in the RIPD |
+
+**Retraining triggers:** a critical performance or calibration alert, or critical drift on any of the
+top features for two consecutive months. A new model version goes through the same gates as the
+first one: data contract on the training data, holdout performance, fairness audit and a review of
+the model card. In this scenario, retraining on the June data would let the model learn the new
+relationship between features and outcomes. That fixes the concept drift but not its root cause.
+The lasting fix is to add a feature that measures real income.
+
+### Limitations
+
+- The dataset is public and believed to be partly simulated. Its applicants are not real people, so
+  the LGPD plan describes how real data would be handled.
+- The drift is simulated, and time is compressed (outcomes are known immediately). In production,
+  outcome-based checks arrive months later.
+- Age is the only protected attribute available, and the age groups are coarse.
+
+### Video
+
+STAR video: *link to be added by the team.*
+
 ## Project layout
 
 ```
@@ -515,8 +792,9 @@ src/credit_scoring/
   model/                    baseline training and production scoring
   drift/                    shock scenario, simulation, PSI and tests, Evidently reports, alerts
   observability/            step tracking, Prometheus metrics, export and push
+  governance/               fairness audit by age group and proxy detection
 monitoring/                 Docker Compose stack, Prometheus config and alert rules, Grafana dashboard
-tests/                      contract, ingestion, simulation, drift detection and observability tests
-reports/                    generated evidence (validation, model, drift, monitoring)
+tests/                      contract, ingestion, simulation, drift detection, observability and fairness tests
+reports/                    generated evidence (validation, model, drift, monitoring, governance)
 docs/images/                dashboard screenshot
 ```
