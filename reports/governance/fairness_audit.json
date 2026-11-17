@@ -1,0 +1,120 @@
+{
+  "protected_attribute": "person_age",
+  "used_as_model_feature": false,
+  "age_groups": {
+    "18-25": [
+      18,
+      25
+    ],
+    "26-35": [
+      26,
+      35
+    ],
+    "36+": [
+      36,
+      100
+    ]
+  },
+  "thresholds": {
+    "disparate_impact_min_ratio": 0.8,
+    "false_rejection_gap_alert": 0.05,
+    "proxy_correlation_alert": 0.5
+  },
+  "disparity_by_dataset": {
+    "reference_holdout": {
+      "least_approved_group": "18-25",
+      "most_approved_group": "36+",
+      "disparate_impact_ratio": 0.9644,
+      "passes_four_fifths_rule": true,
+      "false_rejection_gap": 0.0076,
+      "false_rejection_gap_alert": false,
+      "missed_default_gap": 0.0352
+    },
+    "2026-01": {
+      "least_approved_group": "36+",
+      "most_approved_group": "26-35",
+      "disparate_impact_ratio": 0.9653,
+      "passes_four_fifths_rule": true,
+      "false_rejection_gap": 0.0069,
+      "false_rejection_gap_alert": false,
+      "missed_default_gap": 0.0568
+    },
+    "2026-02": {
+      "least_approved_group": "26-35",
+      "most_approved_group": "18-25",
+      "disparate_impact_ratio": 0.9916,
+      "passes_four_fifths_rule": true,
+      "false_rejection_gap": 0.0009,
+      "false_rejection_gap_alert": false,
+      "missed_default_gap": 0.0789
+    },
+    "2026-03": {
+      "least_approved_group": "18-25",
+      "most_approved_group": "26-35",
+      "disparate_impact_ratio": 0.9815,
+      "passes_four_fifths_rule": true,
+      "false_rejection_gap": 0.005,
+      "false_rejection_gap_alert": false,
+      "missed_default_gap": 0.0948
+    },
+    "2026-04": {
+      "least_approved_group": "18-25",
+      "most_approved_group": "26-35",
+      "disparate_impact_ratio": 0.9379,
+      "passes_four_fifths_rule": true,
+      "false_rejection_gap": 0.0123,
+      "false_rejection_gap_alert": false,
+      "missed_default_gap": 0.0633
+    },
+    "2026-05": {
+      "least_approved_group": "18-25",
+      "most_approved_group": "36+",
+      "disparate_impact_ratio": 0.928,
+      "passes_four_fifths_rule": true,
+      "false_rejection_gap": 0.0022,
+      "false_rejection_gap_alert": false,
+      "missed_default_gap": 0.0892
+    },
+    "2026-06": {
+      "least_approved_group": "36+",
+      "most_approved_group": "26-35",
+      "disparate_impact_ratio": 0.9236,
+      "passes_four_fifths_rule": true,
+      "false_rejection_gap": 0.0137,
+      "false_rejection_gap_alert": false,
+      "missed_default_gap": 0.0304
+    }
+  },
+  "proxy_correlations": [
+    {
+      "feature": "cb_person_cred_hist_length",
+      "spearman_with_age": 0.8044,
+      "strong_proxy": true
+    },
+    {
+      "feature": "person_income",
+      "spearman_with_age": 0.15,
+      "strong_proxy": false
+    },
+    {
+      "feature": "person_emp_length",
+      "spearman_with_age": 0.0982,
+      "strong_proxy": false
+    },
+    {
+      "feature": "loan_amnt",
+      "spearman_with_age": 0.065,
+      "strong_proxy": false
+    },
+    {
+      "feature": "loan_percent_income",
+      "spearman_with_age": -0.0589,
+      "strong_proxy": false
+    },
+    {
+      "feature": "loan_int_rate",
+      "spearman_with_age": 0.0051,
+      "strong_proxy": false
+    }
+  ]
+}

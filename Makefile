@@ -1,4 +1,4 @@
-.PHONY: install data batches validate-good validate-bad train simulate score drift metrics monitor-up monitor-down test lint stage1 stage2 stage3 pipeline all clean
+.PHONY: install data batches validate-good validate-bad train simulate score drift metrics fairness monitor-up monitor-down test lint stage1 stage2 stage3 stage4 pipeline all clean
 
 install:
 	uv sync
@@ -31,6 +31,9 @@ drift:
 metrics:
 	uv run python -m credit_scoring.observability.export
 
+fairness:
+	uv run python -m credit_scoring.governance.fairness
+
 monitor-up:
 	docker compose -f monitoring/compose.yaml up -d
 
@@ -51,7 +54,9 @@ stage2: simulate score drift
 
 stage3: metrics
 
-pipeline: stage1 stage2 stage3
+stage4: fairness
+
+pipeline: stage1 stage2 stage4 stage3
 
 all: monitor-up pipeline
 
