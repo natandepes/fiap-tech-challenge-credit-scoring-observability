@@ -1,0 +1,93 @@
+groups:
+  - name: credit_scoring_latest_month
+    rules:
+      - record: credit:drift_alert_value:latest_month
+        expr: credit_drift_alert_value and on (month) credit_monitoring_latest_month_info
+      - record: credit:feature_psi:latest_month
+        expr: credit_feature_psi and on (month) credit_monitoring_latest_month_info
+
+  - name: credit_scoring_pipeline
+    rules:
+      - alert: PipelineStepFailed
+        expr: credit_pipeline_step_last_success == 0
+        labels:
+          severity: critical
+          category: pipeline
+        annotations:
+          summary: "Pipeline step {{ $labels.step }} failed in its latest run"
+      - alert: BatchRejectedByDataContract
+        expr: sum by (batch, contract) (credit_contract_check_failures) > 0
+        labels:
+          severity: warning
+          category: data_quality
+        annotations:
+          summary: "Batch {{ $labels.batch }} was blocked by {{ $labels.contract }} with {{ $value }} failure cases and quarantined"
+      - alert: PipelineMetricsStale
+        expr: time() - max(push_time_seconds{job="credit_scoring_pipeline"}) > 86400
+        labels:
+          severity: warning
+          category: pipeline
+        annotations:
+          summary: "No pipeline metrics pushed for more than 24 hours"
+
+  - name: credit_scoring_model
+    rules:
+      - alert: FeatureDrift
+        expr: credit:drift_alert_value:latest_month{type="data_drift"}
+        labels:
+          category: model
+        annotations:
+          summary: "{{ $labels.subject }} drifted in {{ $labels.month }} (PSI {{ $value | printf \"%.2f\" }})"
+      - alert: PredictionDrift
+        expr: credit:drift_alert_value:latest_month{type="prediction_drift"}
+        labels:
+          category: model
+        annotations:
+          summary: "Default probability distribution shifted in {{ $labels.month }} (PSI {{ $value | printf \"%.2f\" }})"
+      - alert: ModelPerformanceDegraded
+        expr: credit:drift_alert_value:latest_month{type="performance"}
+        labels:
+          category: model
+        annotations:
+          summary: "{{ $labels.subject }} of {{ $value | printf \"%.3f\" }} vs. reference in {{ $labels.month }}"
+      - alert: ModelMiscalibrated
+        expr: credit:drift_alert_value:latest_month{type="calibration"}
+        labels:
+          category: model
+        annotations:
+          summary: "Observed default rate exceeds predicted by {{ $value | humanizePercentage }} in {{ $labels.month }}"
+
+  - name: infrastructure
+    rules:
+      - alert: MonitoringTargetDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "{{ $labels.job }} is not responding to Prometheus"
+      - alert: HostHighCpuUsage
+        expr: 1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "Host CPU usage above 90% for 5 minutes"
+      - alert: HostHighMemoryUsage
+        expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "Host memory usage above 90% for 5 minutes"
+      - alert: HostDiskAlmostFull
+        expr: max(1 - node_filesystem_avail_bytes{fstype=~"ext4|xfs|btrfs"} / node_filesystem_size_bytes{fstype=~"ext4|xfs|btrfs"}) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "Disk holding the monitoring data more than 90% full"
