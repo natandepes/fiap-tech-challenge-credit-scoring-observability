@@ -13,8 +13,11 @@ Requires [uv](https://docs.astral.sh/uv/) and Python 3.12. No Kaggle account is 
 make install   # create the virtual environment
 make stage1    # download, curate, split, train, then run the good and bad demo batches
 make stage2    # simulate six production months, score them, detect drift (needs stage1)
-make all       # stage1 + stage2
-make test      # contract, ingestion, simulation and drift detection tests
+make monitor-up  # start the Prometheus + Grafana monitoring stack (needs Docker)
+make stage3    # export pipeline, drift and model metrics and push them to the stack
+make pipeline  # stage1 + stage2 + stage3, no Docker needed (the metrics push is skipped with a warning)
+make all       # monitor-up + pipeline: every stage plus the live dashboard
+make test      # contract, ingestion, simulation, drift detection and observability tests
 make clean     # delete everything generated (data, model, logs, reports) to start from scratch
 ```
 
@@ -364,6 +367,142 @@ element ids, so a rerun changes the files but not what they show.
 
 Evidently 0.7 does not work with pandas 3, so pandas is pinned to `<3`.
 
+## Stage 3: pipeline and model observability
+
+```bash
+make monitor-up   # start Pushgateway, Prometheus, node-exporter and Grafana (needs Docker)
+make stage3       # turn logs and drift results into metrics and push them (needs stage1 and stage2)
+```
+
+Then open the dashboard at http://localhost:3000 (anonymous read-only access, no login). Prometheus
+is at http://localhost:9090 and `make monitor-down` stops the stack. Everything is open source and
+runs locally.
+
+![Grafana dashboard](docs/images/grafana-dashboard.png)
+
+### Architecture
+
+```
+pipeline steps ──> logs/pipeline.jsonl ─┐
+                                        ├─> observability.export ──> reports/monitoring/metrics.prom
+Stage 2 drift outputs (reports/drift) ──┘            │
+                                                     └─> Pushgateway ──> Prometheus ──> Grafana
+                                     node-exporter (host) ──┘   (alert rules)
+```
+
+1. **Every pipeline step is tracked.** `observability/step.py` wraps each step (`download`,
+   `prepare`, `train`, `batches`, `ingest`, `simulate`, `score`, `drift`). One run gets one
+   `run_id`, which every log line of that run carries. The step writes `step_started`, then
+   `step_succeeded` or `step_failed` with its wall-clock time, CPU time, peak memory and, on
+   failure, the error.
+2. **Logs and drift results come together in one place.** `credit_scoring.observability.export`
+   reads the structured log and the Stage 2 outputs (`feature_drift_by_month.csv`,
+   `model_health_by_month.csv`, `alerts.json`, `drift_summary.json`) and builds a single set of
+   Prometheus metrics. It always writes them to `reports/monitoring/metrics.prom`, so the evidence
+   exists even without Docker.
+3. **Prometheus collects them.** The pipeline runs as batch jobs, which end before Prometheus can
+   scrape them, so the exporter pushes to a **Pushgateway** that Prometheus scrapes.
+   **node-exporter** adds host metrics, and Prometheus also scrapes every component of the stack
+   to check that it is up.
+4. **Prometheus evaluates the alert rules** in `monitoring/prometheus/rules.yml`, and **Grafana**
+   shows the provisioned dashboard `monitoring/grafana/dashboards/credit-scoring.json`.
+
+If the Pushgateway cannot be reached, the export logs `metrics_push_failed` and still writes the
+snapshot file. Use `uv run python -m credit_scoring.observability.export --no-push` to only write
+the file.
+
+### Metrics
+
+All metrics use the `credit_` prefix. Pipeline metrics are labeled by `step`, and drift and model
+metrics by production `month`.
+
+**Pipeline health**
+
+| Metric | Meaning | Why it matters |
+| --- | --- | --- |
+| `credit_pipeline_step_runs_total{step, status}` | Executions per step, `succeeded` or `failed` | Execution status and failure count |
+| `credit_pipeline_step_last_success{step}` | 1 if the latest run succeeded, 0 if it failed | Current status of each step, drives `PipelineStepFailed` |
+| `credit_pipeline_step_last_duration_seconds{step}` | Wall-clock duration of the latest run | Latency, spots slow steps |
+| `credit_pipeline_step_last_rows_processed{step}` | Rows reported by the latest run | Volume of data processed |
+| `credit_pipeline_step_last_timestamp_seconds{step}` | When the latest run finished | Freshness |
+| `credit_ingest_batches_total{outcome}` / `credit_ingest_rows_total{outcome}` | Batches and rows `accepted` or `rejected` by the data contract | Ingestion success and failure |
+| `credit_contract_check_failures{batch, contract, column, check}` | Failure cases per Pandera check in the latest rejected batch | Which rules bad data breaks, drives `BatchRejectedByDataContract` |
+| `credit_curation_rows{outcome}` | Raw, duplicate, rejected and curated rows of the raw dataset | Transformation volume and data loss |
+| `credit_scoring_batch_latency_seconds{month}` | Time to validate and score a monthly batch | Scoring latency |
+
+**Infrastructure stability**
+
+| Metric | Meaning | Why it matters |
+| --- | --- | --- |
+| `up{job}` | Whether Prometheus can scrape Pushgateway, node-exporter, Prometheus and Grafana | Stack availability, drives `MonitoringTargetDown` |
+| `node_cpu_seconds_total`, `node_memory_*`, `node_filesystem_*` | Host CPU, memory and disk (node-exporter) | Host saturation |
+| `credit_pipeline_step_last_cpu_seconds{step}` / `credit_pipeline_step_last_peak_memory_bytes{step}` | CPU time and peak memory of each step's process | Resource cost per step |
+| `push_time_seconds{job="credit_scoring_pipeline"}` | When the pipeline last pushed its metrics | Detects a pipeline that stopped reporting |
+
+**Drift and model degradation**
+
+| Metric | Meaning | Why it matters |
+| --- | --- | --- |
+| `credit_feature_psi{month, feature}` | PSI of each feature against the reference dataset | Size of each feature's shift |
+| `credit_feature_drift_p_value{month, feature, test}` | KS or chi-square p-value | Statistical significance of the shift |
+| `credit_feature_drifted{month, feature}` / `credit_drifted_features{month}` | Whether a feature crossed PSI 0.10, and how many did | Drifted features per month |
+| `credit_prediction_psi{month}` / `credit_target_psi{month}` | PSI of the predicted probability and of the observed label | Prediction drift and target drift |
+| `credit_model_{roc_auc,recall,precision,brier_score}{month, ground_truth}` | Performance per month | Model degradation |
+| `credit_model_{observed_default_rate,mean_default_probability,predicted_default_rate}{month, ground_truth}` | Observed vs. predicted default rate | Calibration, the only signal for concept drift |
+| `credit_model_baseline{metric}` | The same metrics on the reference holdout | What "degraded" is measured against |
+| `credit_drift_alert_value` / `credit_drift_alert_threshold{month, type, subject, severity}` | Each Stage 2 alert with its value and threshold | Feeds the Prometheus drift alerts |
+| `credit_production_scored_rows{month}` | Applications scored per month | Production volume |
+
+The model metrics have a `ground_truth` label. `observed` is what a lender would see.
+`simulated_without_concept_drift` uses the outcomes the simulator stored before injecting concept
+drift. It exists only in this simulation and separates the damage of each kind of drift.
+
+### Alerts
+
+Alerts are Prometheus alerting rules. Each one fires when a threshold is crossed and shows up in
+Prometheus, in the dashboard's counters and in its "Firing alerts" table. Drift alerts reuse the
+Stage 2 thresholds and look only at the latest production month, so they describe the model's
+current state.
+
+| Alert | Category | Severity | Fires when |
+| --- | --- | --- | --- |
+| `PipelineStepFailed` | pipeline | critical | A step's latest run failed |
+| `BatchRejectedByDataContract` | data quality | warning | The latest rejected batch has contract failures (it was blocked and quarantined) |
+| `PipelineMetricsStale` | pipeline | warning | No metrics pushed for more than 24 hours |
+| `FeatureDrift` | model | warning at PSI ≥ 0.10, critical at ≥ 0.25 | A feature drifted in the latest month |
+| `PredictionDrift` | model | warning at PSI ≥ 0.10, critical at ≥ 0.25 | The predicted default probability drifted |
+| `ModelPerformanceDegraded` | model | critical | ROC AUC dropped ≥ 0.05 or recall dropped ≥ 0.10 against the reference holdout |
+| `ModelMiscalibrated` | model | critical | The observed default rate exceeds the predicted rate by ≥ 5 pp |
+| `MonitoringTargetDown` | infrastructure | critical | A component of the stack is not responding for 1 minute |
+| `HostHighCpuUsage` / `HostHighMemoryUsage` / `HostDiskAlmostFull` | infrastructure | warning | Usage above 90% for 5 minutes |
+
+After `make all`, Prometheus fires 8 alerts. Pipeline and infrastructure are
+healthy, while data quality and the model are not:
+
+| Alert | Severity | Subject |
+| --- | --- | --- |
+| `BatchRejectedByDataContract` | warning | `bad_batch` blocked by `scoring_request_contract` |
+| `FeatureDrift` | critical | `loan_int_rate` (PSI 2.70) |
+| `FeatureDrift` | warning | `loan_amnt` (PSI 0.22), `person_home_ownership` (PSI 0.19) |
+| `PredictionDrift` | critical | `default_probability` |
+| `ModelPerformanceDegraded` | critical | ROC AUC drop, recall drop |
+| `ModelMiscalibrated` | critical | observed default rate 18.3 pp above predicted |
+
+The ingestion step itself shows as succeeded when it rejects the bad batch. The gate did its job,
+and the rejection is reported by the ingestion metrics and `BatchRejectedByDataContract`, not as a
+pipeline failure.
+
+### Dashboard
+
+The **Credit Scoring Observability** dashboard has four sections, and each panel has a description:
+
+| Section | Shows |
+| --- | --- |
+| Overview | Failed steps, critical and warning alerts firing, drifted features, latest month checked, last push, table of firing alerts |
+| Pipeline health | Latest status, duration, rows and run count per step; ingestion gate results; contract failures per check; raw data curation |
+| Infrastructure | Stack targets up, host CPU, memory, disk and uptime, peak memory per step |
+| Model drift and degradation | PSI heatmap by feature and month, alerts per month, ROC AUC and recall, calibration, prediction and target drift, recall with and without concept drift, scoring latency |
+
 ## Project layout
 
 ```
@@ -375,6 +514,9 @@ src/credit_scoring/
   data/                     download, curation and split, demo batches
   model/                    baseline training and production scoring
   drift/                    shock scenario, simulation, PSI and tests, Evidently reports, alerts
-tests/                      contract, ingestion, simulation and drift detection tests
-reports/                    generated evidence (validation, model, drift)
+  observability/            step tracking, Prometheus metrics, export and push
+monitoring/                 Docker Compose stack, Prometheus config and alert rules, Grafana dashboard
+tests/                      contract, ingestion, simulation, drift detection and observability tests
+reports/                    generated evidence (validation, model, drift, monitoring)
+docs/images/                dashboard screenshot
 ```
